@@ -11,10 +11,10 @@
 
 // Student authors (fill in below):
 // NMec:  Name:
+// 112665 Tomás Brás
+// 113480 Afonso Ferreira
 // 
-// 
-// 
-// Date:
+// Date: 11/11/2023
 //
 
 #include "image8bit.h"
@@ -171,7 +171,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (width >= 0);
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
-  // Insert your code here!
+  // Insert your code here!z
 }
 
 /// Destroy the image pointed to by (*imgp).
