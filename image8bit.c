@@ -424,13 +424,19 @@ void ImageBrighten(Image img, double factor) { ///
 /// Returns a rotated version of the image.
 /// The rotation is 90 degrees anti-clockwise.
 /// Ensures: The original img is not modified.
-/// 
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
-  // Insert your code here!
+  // Insert your code here! 
+  Image NewImg = ImageCreate(img->height, img->width, img->maxval);
+  for (int i = 0; i < img->width; i++){
+    for (int j = 0; j < img->height; j++){
+      NewImg->pixel[G(img, i, j)] = img->pixel[G(img, j, i)];
+    }
+  }
+  return NewImg;
 }
 
 /// Mirror an image = flip left-right.
@@ -442,7 +448,12 @@ Image ImageRotate(Image img) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageMirror(Image img) { ///
   assert (img != NULL);
-  // Insert your code here!
+  Image NewImg = ImageCreate(img->width, img->height, img->maxval);
+  for (int i = 0; i < img->width; i++){
+    for (int j = 0; j < img->height; j++){
+      NewImg->pixel[G(img, i, j)] = img->pixel[G(img, img->width - i - 1, j)];
+    }
+  }
 }
 
 /// Crop a rectangular subimage from img.
@@ -461,6 +472,12 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   assert (ImageValidRect(img, x, y, w, h));
   // Insert your code here!
+  Image NewImg = ImageCreate(w, h, img->maxval);
+  for (int i = 0; i < w; i++){
+    for (int j = 0; j < h; j++){
+      NewImg->pixel[G(img, i, j)] = img->pixel[G(img, x + i, y + j)];
+    }
+  }
 }
 
 
@@ -475,8 +492,12 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
+  for (int i = 0; i < img2->width; i++) {
+    for (int j = 0; j < img2->height; j++) {
+      img1->pixel[G(img1, x + i, y + j)] = img2->pixel[G(img2, i, j)];
+    }
+  }
 }
-
 /// Blend an image into a larger image.
 /// Blend img2 into position (x, y) of img1.
 /// This modifies img1 in-place: no allocation involved.
@@ -487,7 +508,13 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-  // Insert your code here!
+  for (int i = 0; i < img2->width; i++) {
+    for (int j = 0; j < img2->height; j++) {
+      int destIndex = G(img1, x + i, y + j);
+      int sourceIndex = G(img2, i, j);
+      img1->pixel[destIndex] = (uint8)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]); // PERCEBER MELHOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    }
+  }
 }
 
 /// Compare an image to a subimage of a larger image.
@@ -497,7 +524,13 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
-  // Insert your code here!
+  assert (ImageValidRect(img1, x, y, img2->width, img2->height));
+  for (int i = 0; i < img2-> width; i++){
+    for (int j = 0; j < img2->height; j++){
+      if (img1->pixel[G(img1, x + i, y + j)] != img2->pixel[G(img2, i, j)]) return 0;
+    }
+  }
+  return 1;
 }
 
 /// Locate a subimage inside another image.
@@ -508,6 +541,15 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   // Insert your code here!
+  for (int i = 0; i < img1->width - img2->width; i++){
+    for (int j = 0; j < img1->height - img2->height; j++){
+      if (ImageMatchSubImage(img1, i, j, img2)){
+        *px = i;
+        *py = j;
+        return 1;
+      }
+    }
+  }
 }
 
 
@@ -517,7 +559,42 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// Each pixel is substituted by the mean of the pixels in the rectangle
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
-void ImageBlur(Image img, int dx, int dy) { ///
-  // Insert your code here!
-}
+void ImageBlur(Image img, int dx, int dy) {
+  assert(img != NULL);
+  int width = img->width;
+  int height = img->height;
+  // Create a temporary image to store the blurred result
+  Image blurredImage = ImageCreate(img->width, img->height, img->maxval);
 
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
+      // Calculate the mean value for the pixel (x, y)
+      int sum = 0;
+      int count = 0;
+
+      for (int i = -dx; i <= dx; i++) {
+        for (int j = -dy; j <= dy; j++) {
+          int newX = x + i;
+          int newY = y + j;
+
+          // Check if the neighboring pixel is within bounds
+          if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
+            sum += img->pixel[G(img, newX, newY)];
+            count++;
+          }
+        }
+      }
+
+      // Calculate the mean and update the pixel in the blurred image
+      blurredImage->pixel[G(blurredImage, x, y)] = (uint8)(sum / count);
+    }
+  }
+
+  // Copy the blurred image back to the original image
+  for (int i = 0; i < width * height; i++) {
+    img->pixel[i] = blurredImage->pixel[i];
+  }
+
+  // Destroy the temporary image
+  ImageDestroy(&blurredImage);
+}
