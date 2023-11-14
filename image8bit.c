@@ -481,24 +481,17 @@ Image ImageMirror(Image img) {
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
-Image ImageCrop(Image img, int x, int y, int w, int h) {
-    assert(img != NULL);
-    assert(ImageValidRect(img, x, y, w, h));
-
-    Image newImg = ImageCreate(w, h, img->maxval);
-    if (newImg == NULL) {
-        // Handle memory allocation failure
-        return NULL;
+Image ImageCrop(Image img, int x, int y, int w, int h) { ///
+  assert (img != NULL);
+  assert (ImageValidRect(img, x, y, w, h));
+  // Insert your code here!
+  Image NewImg = ImageCreate(w, h, img->maxval);
+  for (int i = 0; i < w; i++){
+    for (int j = 0; j < h; j++){
+      NewImg->pixel[G(img, i, j)] = img->pixel[G(img, x + i, y + j)];
     }
-
-    for (int i = 0; i < w; i++) {
-        for (int j = 0; j < h; j++) {
-            uint8 pixelValue = ImageGetPixel(img, x + i, y + j);
-            ImageSetPixel(newImg, i, j, pixelValue);
-        }
-    }
-
-    return newImg;
+  }
+  return NewImg;
 }
 
 
@@ -529,13 +522,11 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-  
   for (int i = 0; i < img2->width; i++) {
     for (int j = 0; j < img2->height; j++) {
       int destIndex = G(img1, x + i, y + j);
       int sourceIndex = G(img2, i, j);
-      img1->pixel[destIndex] = (uint8)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
-      img1->pixel[destIndex] = (img1->pixel[destIndex] > PixMax) ? PixMax : img1->pixel[destIndex];
+      img1->pixel[destIndex] = (uint8)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]); // PERCEBER MELHOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
   }
 }
@@ -587,51 +578,38 @@ void ImageBlur(Image img, int dx, int dy) {
   assert(img != NULL);
   int width = img->width;
   int height = img->height;
-  
   // Create a temporary image to store the blurred result
-  Image blurredImage = ImageCreate(width, height, img->maxval);
+  Image blurredImage = ImageCreate(img->width, img->height, img->maxval);
 
-    int width = img->width;
-    int height = img->height;
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
+      // Calculate the mean value for the pixel (x, y)
+      int sum = 0;
+      int count = 0;
 
-    // Create a temporary buffer to store the blurred result
-    uint8* blurredPixels = (uint8*)malloc(width * height * sizeof(uint8));
-    if (blurredPixels == NULL) {
-        errCause = "Out of memory";
-        return;
-    }
+      for (int i = -dx; i <= dx; i++) {
+        for (int j = -dy; j <= dy; j++) {
+          int newX = x + i;
+          int newY = y + j;
 
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            int sum = 0;
-            int count = 0;
-
-            for (int i = -dx; i <= dx; i++) {
-                for (int j = -dy; j <= dy; j++) {
-                    int newX = x + i;
-                    int newY = y + j;
-
-                    // Check if the neighboring pixel is within bounds
-                    if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
-                        sum += img->pixel[G(img, newX, newY)];
-                        count++;
-                    }
-                }
-            }
-
-            // Calculate the mean as a floating-point value
-            double mean = (double)sum / count;
-
-            // Update the pixel in the blurred buffer
-            blurredPixels[G(img, x, y)] = (uint8)mean;
+          // Check if the neighboring pixel is within bounds
+          if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
+            sum += img->pixel[G(img, newX, newY)];
+            count++;
+          }
         }
-    }
+      }
 
-    // Copy the blurred buffer back to the original image
-    for (int i = 0; i < width * height; i++) {
-        img->pixel[i] = blurredPixels[i];
+      // Calculate the mean and update the pixel in the blurred image
+      blurredImage->pixel[G(blurredImage, x, y)] = (uint8)(sum / count);
     }
+  }
 
-    // Free the temporary buffer
-    free(blurredPixels);
+  // Copy the blurred image back to the original image
+  for (int i = 0; i < width * height; i++) {
+    img->pixel[i] = blurredImage->pixel[i];
+  }
+
+  // Destroy the temporary image
+  ImageDestroy(&blurredImage);
 }
