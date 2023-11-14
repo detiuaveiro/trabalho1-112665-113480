@@ -403,16 +403,13 @@ void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   assert (factor >= 0.0);
   for (int i = 0; i < img->width * img->height; i++){
-    if (img->pixel[i] * factor > img->maxval){
-      img->pixel[i] = img->maxval;
-    }else{
-      img->pixel[i] = img->pixel[i] * factor;
+    if (img->pixel[i] * factor > PixMax){  // Use PixMax instead of img->maxval
+      img->pixel[i] = PixMax;  // Use PixMax instead of img->maxval
+    } else {
+      img->pixel[i] = (uint8)(img->pixel[i] * factor);
     }
   }
-
-  
 }
-
 
 /// Geometric transformations
 
