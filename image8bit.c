@@ -406,20 +406,20 @@ void ImageBrighten(Image img, double factor) {
     for (int i = 0; i < img->width * img->height; i++) {
         int newPixelValue;
 
-        // Se o fator for maior que 1, clareie a imagem; caso contrário, escureça.
+        // If the factor is greater than 1, brighten the image; otherwise, darken.
         if (factor > 1.0) {
             newPixelValue = (int)(img->pixel[i] * factor);
 
-            // Saturação no valor máximo
+            // Saturate at the maximum value
             if (newPixelValue > PixMax) {
                 img->pixel[i] = PixMax;
             } else {
-                img->pixel[i] = newPixelValue;
+                img->pixel[i] = (uint8)newPixelValue;
             }
         } else {
-            // Se o fator for menor ou igual a 1, escureça a imagem sem saturação
+            // If the factor is less than or equal to 1, darken the image without saturation
             newPixelValue = (int)(img->pixel[i] * factor);
-            img->pixel[i] = newPixelValue;
+            img->pixel[i] = (uint8)newPixelValue;
         }
     }
 }
