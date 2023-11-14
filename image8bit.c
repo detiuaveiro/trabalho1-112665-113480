@@ -481,17 +481,24 @@ Image ImageMirror(Image img) {
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
-Image ImageCrop(Image img, int x, int y, int w, int h) { ///
-  assert (img != NULL);
-  assert (ImageValidRect(img, x, y, w, h));
-  // Insert your code here!
-  Image NewImg = ImageCreate(w, h, img->maxval);
-  for (int i = 0; i < w; i++){
-    for (int j = 0; j < h; j++){
-      NewImg->pixel[G(img, i, j)] = img->pixel[G(img, x + i, y + j)];
+Image ImageCrop(Image img, int x, int y, int w, int h) {
+    assert(img != NULL);
+    assert(ImageValidRect(img, x, y, w, h));
+
+    Image newImg = ImageCreate(w, h, img->maxval);
+    if (newImg == NULL) {
+        // Handle memory allocation failure
+        return NULL;
     }
-  }
-  return NewImg;
+
+    for (int i = 0; i < w; i++) {
+        for (int j = 0; j < h; j++) {
+            uint8 pixelValue = ImageGetPixel(img, x + i, y + j);
+            ImageSetPixel(newImg, i, j, pixelValue);
+        }
+    }
+
+    return newImg;
 }
 
 
@@ -578,8 +585,9 @@ void ImageBlur(Image img, int dx, int dy) {
   assert(img != NULL);
   int width = img->width;
   int height = img->height;
+  
   // Create a temporary image to store the blurred result
-  Image blurredImage = ImageCreate(img->width, img->height, img->maxval);
+  Image blurredImage = ImageCreate(width, height, img->maxval);
 
   for (int x = 0; x < width; x++) {
     for (int y = 0; y < height; y++) {
