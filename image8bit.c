@@ -405,15 +405,12 @@ void ImageBrighten(Image img, double factor) { ///
 
   for (int i = 0; i < img->width * img->height; i++){
     int newPixelValue = (int)(img->pixel[i] * factor);
-
-    // Ensure the new pixel value is within the valid range [0, PixMax]
-    if (newPixelValue > PixMax) {
-      img->pixel[i] = PixMax;
-    } else {
-      img->pixel[i] = (uint8)newPixelValue;
-    }
+    if (newPixelValue > img->maxval) newPixelValue = img->maxval;
+    img->pixel[i] = (uint8)newPixelValue;
   }
 }
+  
+
 
 /// Geometric transformations
 
