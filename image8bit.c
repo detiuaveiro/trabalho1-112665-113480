@@ -525,22 +525,24 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
 /// alpha usually is in [0.0, 1.0], but values outside that interval
 /// may provide interesting effects.  Over/underflows should saturate.
 void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
-  assert(img1 != NULL);
-  assert(img2 != NULL);
-  assert(ImageValidRect(img1, x, y, img2->width, img2->height));
+    assert(img1 != NULL);
+    assert(img2 != NULL);
+    assert(ImageValidRect(img1, x, y, img2->width, img2->height));
 
-  for (int i = 0; i < img2->width; i++) {
-    for (int j = 0; j < img2->height; j++) {
-      int destIndex = G(img1, x + i, y + j);
-      int sourceIndex = G(img2, i, j);
+    // Iterate over the pixels of img2 and blend them into img1
+    for (int i = 0; i < img2->width; i++) {
+        for (int j = 0; j < img2->height; j++) {
+            int destIndex = G(img1, x + i, y + j);
+            int sourceIndex = G(img2, i, j);
 
-      // Blend the pixels using the specified alpha value
-      int blendedPixel = (int)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
+            int blendedValue = (int)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
+            img1->pixel[destIndex] = blendedValue;
+            img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : blendedValue);
+            img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : (blendedValue < 0 ? 0 : blendedValue));
 
-      // Saturate the result to ensure it stays within the valid range [0, PixMax]
-      img1->pixel[destIndex] = (blendedPixel > PixMax) ? PixMax : (uint8)blendedPixel;
+
+        }
     }
-  }
 }
 
 
