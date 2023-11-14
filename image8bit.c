@@ -344,8 +344,7 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // This internal function is used in ImageGetPixel / ImageSetPixel. 
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
-  int index;
-  // Insert your code here!
+  int index = y * img->width + x;
   assert (0 <= index && index < img->width*img->height);
   return index;
 }
@@ -446,7 +445,7 @@ Image ImageRotate(Image img) { ///
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
-Image ImageMirror(Image img) { ///
+Image ImageMirror(Image img) {
   assert (img != NULL);
   Image NewImg = ImageCreate(img->width, img->height, img->maxval);
   for (int i = 0; i < img->width; i++){
@@ -454,6 +453,7 @@ Image ImageMirror(Image img) { ///
       NewImg->pixel[G(img, i, j)] = img->pixel[G(img, img->width - i - 1, j)];
     }
   }
+  return NewImg;
 }
 
 /// Crop a rectangular subimage from img.
@@ -478,6 +478,7 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
       NewImg->pixel[G(img, i, j)] = img->pixel[G(img, x + i, y + j)];
     }
   }
+  return NewImg;
 }
 
 
@@ -550,6 +551,7 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
       }
     }
   }
+  return 0;
 }
 
 
