@@ -406,18 +406,18 @@ void ImageBrighten(Image img, double factor) {
     for (int i = 0; i < img->width * img->height; i++) {
         int newPixelValue;
 
-        // Se o fator for maior que 1, clareie a imagem; caso contrário, escureça.
+        // If the factor is greater than 1, brighten the image; otherwise, darken.
         if (factor > 1.0) {
             newPixelValue = (int)(img->pixel[i] * factor);
 
-            // Saturação no valor máximo
+            // Saturate at the maximum value
             if (newPixelValue > PixMax) {
                 img->pixel[i] = PixMax;
             } else {
                 img->pixel[i] = (uint8)newPixelValue;
             }
         } else {
-            // Se o fator for menor ou igual a 1, escureça a imagem sem saturação
+            // If the factor is less than or equal to 1, darken the image without saturation
             newPixelValue = (int)(img->pixel[i] * factor);
             img->pixel[i] = (uint8)newPixelValue;
         }
@@ -543,13 +543,13 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
       int destIndex = G(img1, x + i, y + j);
       int sourceIndex = G(img2, i, j);
 
-      // Blend the pixels using the specified alpha value
-      int blendedPixel = (int)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
+            int blendedValue = (int)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
+            img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : blendedValue);
+            img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : (blendedValue < 0 ? 0 : blendedValue));
 
-      // Saturate the result to ensure it stays within the valid range [0, PixMax]
-      img1->pixel[destIndex] = (blendedPixel > PixMax) ? PixMax : (uint8)blendedPixel;
+
+        }
     }
-  }
 }
 
 
