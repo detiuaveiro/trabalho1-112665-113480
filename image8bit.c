@@ -480,22 +480,26 @@ Image ImageCrop(Image img, int x, int y, int w, int h) {
     assert(img != NULL);
     assert(ImageValidRect(img, x, y, w, h));
 
+    // Create a new image for the cropped result
     Image newImg = ImageCreate(w, h, img->maxval);
     if (newImg == NULL) {
-        // Handle memory allocation failure
+        errCause = "Failed to create a new image for cropping";
         return NULL;
     }
 
+    // Copy pixels from the original image to the cropped image
     for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {
+            // Use ImageGetPixel to retrieve pixel value from the original image
             uint8 pixelValue = ImageGetPixel(img, x + i, y + j);
+
+            // Use ImageSetPixel to set the pixel value in the new image
             ImageSetPixel(newImg, i, j, pixelValue);
         }
     }
 
     return newImg;
 }
-
 
 /// Operations on two images
 
