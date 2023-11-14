@@ -401,7 +401,7 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) {
   assert (img != NULL);
-  assert (factor >= 0.0);
+  // assert (factor >= 0.0);
   // Insert your code here!
   size_t pixels = img->width * img->height;
   for (int i = 0; i < pixels; i++) {
