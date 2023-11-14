@@ -610,7 +610,7 @@ void ImageBlur(Image img, int dx, int dy) {
       }
 
       // Calculate the mean and update the pixel in the blurred image
-      blurredImage->pixel[G(blurredImage, x, y)] = (uint8)(sum / count);
+blurredImage->pixel[G(blurredImage, x, y)] = (uint8)(sum / (double)count);
     }
   }
 
