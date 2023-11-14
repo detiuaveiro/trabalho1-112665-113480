@@ -402,11 +402,15 @@ void ImageThreshold(Image img, uint8 thr) { ///
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   assert (factor >= 0.0);
+
   for (int i = 0; i < img->width * img->height; i++){
-    if (img->pixel[i] * factor > PixMax){  // Use PixMax instead of img->maxval
-      img->pixel[i] = PixMax;  // Use PixMax instead of img->maxval
+    int newPixelValue = (int)(img->pixel[i] * factor);
+
+    // Ensure the new pixel value is within the valid range [0, PixMax]
+    if (newPixelValue > PixMax) {
+      img->pixel[i] = PixMax;
     } else {
-      img->pixel[i] = (uint8)(img->pixel[i] * factor);
+      img->pixel[i] = (uint8)newPixelValue;
     }
   }
 }
