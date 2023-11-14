@@ -402,11 +402,15 @@ void ImageThreshold(Image img, uint8 thr) { ///
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   assert (factor >= 0.0);
+
   for (int i = 0; i < img->width * img->height; i++){
-    if (img->pixel[i] * factor > PixMax){  // Use PixMax instead of img->maxval
-      img->pixel[i] = PixMax;  // Use PixMax instead of img->maxval
+    int newPixelValue = (int)(img->pixel[i] * factor);
+
+    // Ensure the new pixel value is within the valid range [0, PixMax]
+    if (newPixelValue > PixMax) {
+      img->pixel[i] = PixMax;
     } else {
-      img->pixel[i] = (uint8)(img->pixel[i] * factor);
+      img->pixel[i] = (uint8)newPixelValue;
     }
   }
 }
@@ -432,15 +436,19 @@ void ImageBrighten(Image img, double factor) { ///
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
-  assert (img != NULL);
-  // Insert your code here! 
-  Image NewImg = ImageCreate(img->height, img->width, img->maxval);
-  for (int i = 0; i < img->width; i++) {
-      for (int j = 0; j < img->height; j++) {
-          NewImg->pixel[i * img->height + j] = img->pixel[j * img->width + i];
-      }
-  }
-  return NewImg;
+    assert(img != NULL);
+
+    // Create a new image with swapped width and height
+    Image newImg = ImageCreate(img->height, img->width, img->maxval);
+
+    for (int i = 0; i < img->width; i++) {
+        for (int j = 0; j < img->height; j++) {
+            // Copy pixels from the original image to the rotated image
+            newImg->pixel[j * img->width + i] = img->pixel[i * img->height + j];
+        }
+    }
+
+    return newImg;
 }
 
 /// Mirror an image = flip left-right.
