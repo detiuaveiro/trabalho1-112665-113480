@@ -536,7 +536,6 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
             int sourceIndex = G(img2, i, j);
 
             int blendedValue = (int)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
-            img1->pixel[destIndex] = blendedValue;
             img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : blendedValue);
             img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : (blendedValue < 0 ? 0 : blendedValue));
 
