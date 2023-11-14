@@ -401,18 +401,21 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  // ? assert (factor >= 0.0);
-  // Insert your code here!
-  size_t area=img->width*img->height;
+  assert (factor >= 0.0);
+  size_t area = img->width * img->height;
+
   for (int i = 0; i < area; i++) {
-    if (img->pixel[i] * factor > img->maxval) {
+    int newPixelValue = (int)(img->pixel[i] * factor);
+
+    // Saturate at the maximum value
+    if (newPixelValue > img->maxval) {
       img->pixel[i] = img->maxval;
-    }
-    else {
-      img->pixel[i] = img->pixel[i] * factor;
+    } else {
+      img->pixel[i] = (uint8)newPixelValue;
     }
   }
 }
+
 
 
 /// Geometric transformations
@@ -610,7 +613,7 @@ void ImageBlur(Image img, int dx, int dy) {
       }
 
       // Calculate the mean and update the pixel in the blurred image
-blurredImage->pixel[G(blurredImage, x, y)] = (uint8)(sum / (double)count);
+      blurredImage->pixel[G(blurredImage, x, y)] = (uint8)(sum / (double)count);
     }
   }
 
