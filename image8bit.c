@@ -405,12 +405,11 @@ void ImageBrighten(Image img, double factor) { ///
   for (int i = 0; i < img->width * img->height; i++){
     if (img->pixel[i] * factor > img->maxval){
       img->pixel[i] = img->maxval;
-    }else{
+    }
+    else{
       img->pixel[i] = img->pixel[i] * factor;
     }
   }
-
-  
 }
 
 
@@ -438,10 +437,10 @@ Image ImageRotate(Image img) { ///
   assert (img != NULL);
   // Insert your code here! 
   Image NewImg = ImageCreate(img->height, img->width, img->maxval);
-  for (int i = 0; i < img->width; i++){
-    for (int j = 0; j < img->height; j++){
-      NewImg->pixel[G(img, i, j)] = img->pixel[G(img, j, i)];
-    }
+  for (int i = 0; i < img->width; i++) {
+      for (int j = 0; j < img->height; j++) {
+          NewImg->pixel[i * img->height + j] = img->pixel[j * img->width + i];
+      }
   }
   return NewImg;
 }
