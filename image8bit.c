@@ -493,26 +493,22 @@ Image ImageCrop(Image img, int x, int y, int w, int h) {
     assert(img != NULL);
     assert(ImageValidRect(img, x, y, w, h));
 
-    // Create a new image for the cropped result
     Image newImg = ImageCreate(w, h, img->maxval);
     if (newImg == NULL) {
-        errCause = "Failed to create a new image for cropping";
+        // Handle memory allocation failure
         return NULL;
     }
 
-    // Copy pixels from the original image to the cropped image
     for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {
-            // Use ImageGetPixel to retrieve pixel value from the original image
             uint8 pixelValue = ImageGetPixel(img, x + i, y + j);
-
-            // Use ImageSetPixel to set the pixel value in the new image
             ImageSetPixel(newImg, i, j, pixelValue);
         }
     }
 
     return newImg;
 }
+
 
 /// Operations on two images
 
@@ -538,24 +534,22 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
 /// alpha usually is in [0.0, 1.0], but values outside that interval
 /// may provide interesting effects.  Over/underflows should saturate.
 void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
-    assert(img1 != NULL);
-    assert(img2 != NULL);
-    assert(ImageValidRect(img1, x, y, img2->width, img2->height));
+  assert(img1 != NULL);
+  assert(img2 != NULL);
+  assert(ImageValidRect(img1, x, y, img2->width, img2->height));
 
-    // Iterate over the pixels of img2 and blend them into img1
-    for (int i = 0; i < img2->width; i++) {
-        for (int j = 0; j < img2->height; j++) {
-            int destIndex = G(img1, x + i, y + j);
-            int sourceIndex = G(img2, i, j);
+  for (int i = 0; i < img2->width; i++) {
+    for (int j = 0; j < img2->height; j++) {
+      int destIndex = G(img1, x + i, y + j);
+      int sourceIndex = G(img2, i, j);
 
-            int blendedValue = (int)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
-            img1->pixel[destIndex] = blendedValue;
-            img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : blendedValue);
-            img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : (blendedValue < 0 ? 0 : blendedValue));
+      // Blend the pixels using the specified alpha value
+      int blendedPixel = (int)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
 
-
-        }
+      // Saturate the result to ensure it stays within the valid range [0, PixMax]
+      img1->pixel[destIndex] = (blendedPixel > PixMax) ? PixMax : (uint8)blendedPixel;
     }
+  }
 }
 
 
