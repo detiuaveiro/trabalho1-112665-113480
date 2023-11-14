@@ -345,9 +345,10 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
   int index = y * img->width + x;
-  assert (0 <= index && index < img->width*img->height);
+  assert (0 <= index && index < img->width * img->height);
   return index;
 }
+
 
 /// Get the pixel (level) at position (x,y).
 uint8 ImageGetPixel(Image img, int x, int y) { ///
