@@ -414,12 +414,12 @@ void ImageBrighten(Image img, double factor) {
             if (newPixelValue > PixMax) {
                 img->pixel[i] = PixMax;
             } else {
-                img->pixel[i] = (uint8)newPixelValue;
+                img->pixel[i] = newPixelValue;
             }
         } else {
             // Se o fator for menor ou igual a 1, escureça a imagem sem saturação
             newPixelValue = (int)(img->pixel[i] * factor);
-            img->pixel[i] = (uint8)newPixelValue;
+            img->pixel[i] = newPixelValue;
         }
     }
 }
