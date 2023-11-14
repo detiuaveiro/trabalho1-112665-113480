@@ -433,8 +433,22 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
-  // Insert your code here! 
+  
+  // Check for valid dimensions
+  if (img->width <= 0 || img->height <= 0) {
+    errno = EINVAL; // Invalid argument
+    errCause = "Invalid image dimensions for rotation";
+    return NULL;
+  }
+
+  // Attempt to create a new image with swapped dimensions
   Image NewImg = ImageCreate(img->height, img->width, img->maxval);
+  if (NewImg == NULL) {
+    // Memory allocation failed
+    errCause = "Failed to allocate memory for rotated image";
+    return NULL;
+  }
+
   for (int i = 0; i < img->width; i++) {
       for (int j = 0; j < img->height; j++) {
           NewImg->pixel[i * img->height + j] = img->pixel[j * img->width + i];
