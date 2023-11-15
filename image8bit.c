@@ -403,7 +403,8 @@ void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   assert( factor > 0.0);
   for (int i = 0; i < img->width * img->height; i++){
-    img->pixel[i] = (uint8)(img->pixel[i] * factor);
+    PIXMEM +=1;
+    img->pixel[i] = (uint8)(img->pixel[i] * factor + 0.5);
     if (img->pixel[i] > img->maxval) img->pixel[i] = img->maxval;
   }
 }
@@ -431,13 +432,17 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) {
   assert(img != NULL);
-
-  // Create a new image with swapped width and height
-  Image newImg = ImageCreate(img->height, img->width, img->maxval);
-  for (int i = 0; i < img->width; i++) {
-    for (int j = 0; j < img->height; j++) {
-      // Copy pixels from the original image to the rotated image
-      newImg->pixel[j * newImg->width + i] = img->pixel[i * img->height + j];
+  uint8 maxval = img->maxval;
+  Image newImg = ImageCreate(img->height, img->width, maxval);
+  
+  if (newImg == NULL) {
+    // Handle memory allocation failure
+    return NULL;
+  }
+  for (int i = 0; i < img->height; i++) {
+    for (int j = 0; j < img->width; j++) {
+      uint8 newPixel = img->pixel[i*img->width + j];
+      newImg->pixel[(img->width - j - 1) * img->height + i] = newPixel;
     }
   }
   return newImg;
