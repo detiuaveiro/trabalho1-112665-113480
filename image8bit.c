@@ -627,5 +627,3 @@ void ImageBlur(Image img, int dx, int dy) {
   // Destroy the temporary image
   ImageDestroy(&blurredImage);
 }
-
-///aaaaaaaaaaaaaaaaaaaaaaaaaaa
