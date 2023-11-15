@@ -558,6 +558,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   for (int i = 0; i < img2-> width; i++){
     for (int j = 0; j < img2->height; j++){
+      PIXMEM += 1;
       if (img1->pixel[G(img1, x + i, y + j)] != img2->pixel[G(img2, i, j)]) return 0;
     }
   }
@@ -568,13 +569,13 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 /// Searches for img2 inside img1.
 /// If a match is found, returns 1 and matching position is set in vars (*px, *py).
 /// If no match is found, returns 0 and (*px, *py) are left untouched.
-int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
+int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) {
   assert (img1 != NULL);
   assert (img2 != NULL);
-  // Insert your code here!
   for (int i = 0; i < img1->width - img2->width; i++){
     for (int j = 0; j < img1->height - img2->height; j++){
       if (ImageMatchSubImage(img1, i, j, img2)){
+        PIXMEM += 1;
         *px = i;
         *py = j;
         return 1;
