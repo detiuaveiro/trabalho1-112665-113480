@@ -447,30 +447,7 @@ Image ImageRotate(Image img) {
   }
   return newImg;
 }
-Image ImageRotate(Image img) { ///
-  assert (img != NULL);
-  int width = img->width;
-  int height = img->height;
-  uint8 maxval = img->maxval;
 
-  // Criar uma nova imagem com dimensões trocadas para a rotação
-  Image rotatedImage = ImageCreate(height, width, maxval);
-  if (rotatedImage == NULL) {
-    errCause = "Memory allocation error for rotated image";
-	return NULL;
-  }
-  for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            // Obter o valor do pixel da imagem original
-            uint8 currentPixel = img->pixel[i * width + j];
-            // Preencher a nova imagem com os valores rotacionados
-            rotatedImage->pixel[(width - j - 1) * height + i] = currentPixel;
-        }
-    }
-
-    return rotatedImage;
-
-}
 /// Mirror an image = flip left-right.
 /// Returns a mirrored version of the image.
 /// Ensures: The original img is not modified.
