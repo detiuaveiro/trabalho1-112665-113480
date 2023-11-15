@@ -588,8 +588,6 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// Each pixel is substituted by the mean of the pixels in the rectangle
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
-#include <math.h>
-
 void ImageBlur(Image img, int dx, int dy) {
   assert (img != NULL);
   assert (dx >= 0 && dy >= 0);
