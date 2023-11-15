@@ -441,7 +441,7 @@ Image ImageRotate(Image img) {
   for (int i = 0; i < img->height; i++) {
     for (int j = 0; j < img->width; j++) {
       uint8 newPixel = img->pixel[i*img->width + j];
-      newImg->pixel[j * newImg->width + i] = newPixel;
+      newImg->pixel[i * newImg->width + j] = newPixel;
     }
   }
   return newImg;
