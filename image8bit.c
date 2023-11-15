@@ -430,29 +430,21 @@ void ImageBrighten(Image img, double factor) { ///
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
-Image ImageRotate(Image img) { ///
-  assert (img != NULL);
-  int width = img->width;
-  int height = img->height;
-  uint8 maxval = img->maxval;
-
-  // Criar uma nova imagem com dimensões trocadas para a rotação
-  Image rotatedImage = ImageCreate(height, width, maxval);
-  if (rotatedImage == NULL) {
-    errCause = "Memory allocation error for rotated image";
-	return NULL;
+Image ImageRotate(Image img) {
+  assert(img != NULL);
+  // Create a new image with swapped width and height
+  Image newImg = ImageCreate(img->height, img->width, img->maxval);
+  if (newImg == NULL) {
+    // Handle memory allocation failure
+    return NULL;
   }
-  for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            // Obter o valor do pixel da imagem original
-            uint8 currentPixel = img->pixel[i * width + j];
-            // Preencher a nova imagem com os valores rotacionados
-            rotatedImage->pixel[(width - j - 1) * height + i] = currentPixel;
-        }
+  for (int i = 0; i < img->height; i++) {
+    for (int j = 0; j < img->width; j++) {
+      uint8 newPixel = img->pixel[i*img->width + j];
+      newImg->pixel[(i - j - 1) * img->height + i] = newPixel;
     }
-
-    return rotatedImage;
-
+  }
+  return newImg;
 }
 
 /// Mirror an image = flip left-right.
