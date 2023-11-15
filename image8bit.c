@@ -401,14 +401,10 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  assert (factor>0.0);
+  assert( factor > 0.0);
   for (int i = 0; i < img->width * img->height; i++){
-    PIXMEM += 2;
-    img->pixel[i] = (uint8)(img->pixel[i] * factor+ 0.5);
-    if (img->pixel[i] > img->maxval){
-      img->pixel[i] = img->maxval;
-      PIXMEM += 1;
-    }
+    img->pixel[i] = (uint8)(img->pixel[i] * factor);
+    if (img->pixel[i] > img->maxval) img->pixel[i] = img->maxval;
   }
 }
 
@@ -438,13 +434,8 @@ Image ImageRotate(Image img) {
 
   // Create a new image with swapped width and height
   Image newImg = ImageCreate(img->height, img->width, img->maxval);
-  if(newImg == NULL) {
-    // Handle memory allocation failure
-    return NULL;
-  }
   for (int i = 0; i < img->width; i++) {
     for (int j = 0; j < img->height; j++) {
-      PIXMEM += 2;
       // Copy pixels from the original image to the rotated image
       newImg->pixel[j * newImg->width + i] = img->pixel[i * img->height + j];
     }
@@ -527,23 +518,29 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
 /// alpha usually is in [0.0, 1.0], but values outside that interval
 /// may provide interesting effects.  Over/underflows should saturate.
 void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
-  assert(img1 != NULL);
-  assert(img2 != NULL);
-  assert(ImageValidRect(img1, x, y, img2->width, img2->height));
+    assert(img1 != NULL);
+    assert(img2 != NULL);
+    assert(ImageValidRect(img1, x, y, img2->width, img2->height));
 
-  for (int i = 0; i < img2->width; i++) {
-    for (int j = 0; j < img2->height; j++) {
-      int destIndex = G(img1, x + i, y + j);
-      int sourceIndex = G(img2, i, j);
+    for (int i = 0; i < img2->height; i++) {
+        for (int j = 0; j < img2->width; j++) {
+            // Get the pixel values from both images
+            uint8_t pixel1 = img1->pixel[(y + i) * img1->width + (x + j)];
+            uint8_t pixel2 = img2->pixel[i * img2->width + j];
 
-            int blendedValue = (int)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
-            img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : blendedValue);
-            img1->pixel[destIndex] = (uint8)(blendedValue > PixMax ? PixMax : (blendedValue < 0 ? 0 : blendedValue));
+            // Calculate the new pixel value after blending
+            double blendedPixel = (1.0 - alpha) * pixel1 + alpha * pixel2;
 
+            // Round and saturate the resulting value to the range [0, maxval]
+            uint8_t finalPixel = (blendedPixel > img1->maxval) ? img1->maxval : 
+                                 (blendedPixel < 0) ? 0 : (uint8_t)(blendedPixel + 0.5);
 
+            // Update the pixel in the larger image (img1)
+            img1->pixel[(y + i) * img1->width + (x + j)] = finalPixel;
         }
     }
 }
+
 
 
 /// Compare an image to a subimage of a larger image.
@@ -590,7 +587,7 @@ void ImageBlur(Image img, int dx, int dy) {
   assert(img != NULL);
   int width = img->width;
   int height = img->height;
-  
+
   // Create a temporary image to store the blurred result
   Image blurredImage = ImageCreate(width, height, img->maxval);
 
@@ -613,7 +610,7 @@ void ImageBlur(Image img, int dx, int dy) {
       }
 
       // Calculate the mean and update the pixel in the blurred image
-      blurredImage->pixel[G(blurredImage, x, y)] = (uint8)(sum / (double)count);
+      blurredImage->pixel[G(blurredImage, x, y)] = (count > 0) ? (uint8_t)(sum / (double)count) : img->pixel[G(img, x, y)];
     }
   }
 
@@ -625,3 +622,5 @@ void ImageBlur(Image img, int dx, int dy) {
   // Destroy the temporary image
   ImageDestroy(&blurredImage);
 }
+
+///aaaaaaaaaaaaaaaaaaaaaaaaaaa
