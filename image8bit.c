@@ -612,6 +612,7 @@ void ImageBlur(Image img, int dx, int dy) {
       }
       ImageSetPixel(blurredImage, i, j, (sum + count / 2) / count);
     }
+  }
 
   // Copy the blurred values back to the original image
   for (int i = 0; i < img->width; i++) {
@@ -622,5 +623,4 @@ void ImageBlur(Image img, int dx, int dy) {
 
   // Destroy the temporary image
   ImageDestroy(&blurredImage);
-}
 }
