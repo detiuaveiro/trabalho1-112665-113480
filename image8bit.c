@@ -527,15 +527,21 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
     assert(img2 != NULL);
     assert(ImageValidRect(img1, x, y, img2->width, img2->height));
 
-    for (int i = 0; i < img2->width; i++) {
-        for (int j = 0; j < img2->height; j++) {
-            int destIndex = G(img1, x + i, y + j);
-            int sourceIndex = G(img2, i, j);
+    for (int i = 0; i < img2->height; i++) {
+        for (int j = 0; j < img2->width; j++) {
+            // Get the pixel values from both images
+            uint8_t pixel1 = img1->pixel[(y + i) * img1->width + (x + j)];
+            uint8_t pixel2 = img2->pixel[i * img2->width + j];
 
-            int blendedValue = (int)((1.0 - alpha) * img1->pixel[destIndex] + alpha * img2->pixel[sourceIndex]);
+            // Calculate the new pixel value after blending
+            double blendedPixel = (1.0 - alpha) * pixel1 + alpha * pixel2;
 
-            // Saturate the blended value to the range [0, PixMax]
-            img1->pixel[destIndex] = (uint8_t)(blendedValue > PixMax ? PixMax : (blendedValue < 0 ? 0 : blendedValue));
+            // Round and saturate the resulting value to the range [0, maxval]
+            uint8_t finalPixel = (blendedPixel > img1->maxval) ? img1->maxval : 
+                                 (blendedPixel < 0) ? 0 : (uint8_t)(blendedPixel + 0.5);
+
+            // Update the pixel in the larger image (img1)
+            img1->pixel[(y + i) * img1->width + (x + j)] = finalPixel;
         }
     }
 }
