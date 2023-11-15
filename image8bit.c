@@ -344,9 +344,9 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // This internal function is used in ImageGetPixel / ImageSetPixel. 
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
-  assert (img != NULL);
-  assert (ImageValidPos(img, x, y));
-  return y*img->width + x;
+  int index = y * img->width + x;
+  assert (0 <= index && index < img->width*img->height);
+  return index;
 }
 
 /// Get the pixel (level) at position (x,y).
@@ -403,10 +403,8 @@ void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   assert (factor >= 0.0);
   size_t area = img->width * img->height;
-
   for (int i = 0; i < area; i++) {
-    int newPixelValue = (int)(img->pixel[i] * factor);
-
+  double newPixelValue = (double)img->pixel[i] * factor;
     // Saturate at the maximum value
     if (newPixelValue > img->maxval) {
       img->pixel[i] = img->maxval;
