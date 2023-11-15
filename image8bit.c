@@ -401,9 +401,14 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
+  assert (factor>0.0);
   for (int i = 0; i < img->width * img->height; i++){
-    img->pixel[i] = (uint8)(img->pixel[i] * factor);
-    if (img->pixel[i] > img->maxval) img->pixel[i] = img->maxval;
+    PIXMEM += 2;
+    img->pixel[i] = (uint8)(img->pixel[i] * factor+ 0.5);
+    if (img->pixel[i] > img->maxval){
+      img->pixel[i] = img->maxval;
+      PIXMEM += 1;
+    }
   }
 }
 
@@ -433,8 +438,13 @@ Image ImageRotate(Image img) {
 
   // Create a new image with swapped width and height
   Image newImg = ImageCreate(img->height, img->width, img->maxval);
+  if(newImg == NULL) {
+    // Handle memory allocation failure
+    return NULL;
+  }
   for (int i = 0; i < img->width; i++) {
     for (int j = 0; j < img->height; j++) {
+      PIXMEM += 2;
       // Copy pixels from the original image to the rotated image
       newImg->pixel[j * newImg->width + i] = img->pixel[i * img->height + j];
     }
