@@ -592,7 +592,7 @@ void ImageBlur(Image img, int dx, int dy) {
   assert(img != NULL);
   int width = img->width;
   int height = img->height;
-  
+
   // Create a temporary image to store the blurred result
   Image blurredImage = ImageCreate(width, height, img->maxval);
 
@@ -615,7 +615,7 @@ void ImageBlur(Image img, int dx, int dy) {
       }
 
       // Calculate the mean and update the pixel in the blurred image
-      blurredImage->pixel[G(blurredImage, x, y)] = (uint8)(sum / (double)count);
+      blurredImage->pixel[G(blurredImage, x, y)] = (count > 0) ? (uint8_t)(sum / (double)count) : img->pixel[G(img, x, y)];
     }
   }
 
@@ -627,4 +627,5 @@ void ImageBlur(Image img, int dx, int dy) {
   // Destroy the temporary image
   ImageDestroy(&blurredImage);
 }
+
 ///aaaaaaaaaaaaaaaaaaaaaaaaaaa
