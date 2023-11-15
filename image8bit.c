@@ -591,41 +591,35 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 #include <math.h>
 
 void ImageBlur(Image img, int dx, int dy) {
-    assert(img != NULL);
+  assert (img != NULL);
+  assert (dx >= 0 && dy >= 0);
 
-    int width = img->width;
-    int height = img->height;
+  // Create a temporary image to store the blurred result
+  Image blurredImage = ImageCreate(img->width, img->height, img->maxval);
 
-    Image tempImage = ImageCreate(width, height, img->maxval);
+  for (int i = 0; i < img->width; i++) {
+    for (int j = 0; j < img->height; j++) {
+      int sum = 0;
+      int count = 0;
 
-    for (int x = 0; x < width; x++) {
-        for (int y = 0; y < height; y++) {
-            int sum = 0;
-            int count = 0;
-
-            for (int i = -dx; i <= dx; i++) {
-                for (int j = -dy; j <= dy; j++) {
-                    int newX = x + i;
-                    int newY = y + j;
-
-                    // Verificar se o pixel vizinho está dentro dos limites
-                    if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
-                        sum += img->pixel[G(img, newX, newY)];
-                        count++;
-                    }
-                }
-            }
-
-            // Calcular a média e realizar o arredondamento manualmente
-            tempImage->pixel[G(tempImage, x, y)] = (count > 0) ? (uint8_t)((sum + count / 2) / count) : img->pixel[G(img, x, y)];
+      for (int k = i - dx; k <= i + dx; k++) {
+        for (int l = j - dy; l <= j + dy; l++) {
+          if (ImageValidPos(img, k, l)) {
+            sum += ImageGetPixel(img, k, l);
+            count++;
+          }
         }
+      }
+      ImageSetPixel(blurredImage, i, j, (sum + count / 2) / count);
     }
 
-    // Copiar a imagem temporária de volta para a imagem original
-    for (int i = 0; i < width * height; i++) {
-        img->pixel[i] = tempImage->pixel[i];
+  // Copy the blurred values back to the original image
+  for (int i = 0; i < img->width; i++) {
+    for (int j = 0; j < img->height; j++) {
+      ImageSetPixel(img, i, j, ImageGetPixel(blurredImage, i, j));
     }
+  }
 
-    // Destruir a imagem temporária
-    ImageDestroy(&tempImage);
+  // Destroy the temporary image
+  ImageDestroy(&blurredImage);
 }
