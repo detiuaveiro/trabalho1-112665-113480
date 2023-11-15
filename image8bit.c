@@ -145,7 +145,8 @@ static int check(int condition, const char* failmsg) {
 /// Currently, simply calibrate instrumentation and set names of counters.
 void ImageInit(void) { ///
   InstrCalibrate();
-  InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
+  InstrName[0] = "pixmem";
+  // InstrCount[0] will count pixel array acesses
   // Name other counters here...
   
 }
@@ -593,7 +594,7 @@ void ImageBlur(Image img, int dx, int dy) {
   assert (img != NULL);
   assert (dx >= 0 && dy >= 0);
 
-  // Create a temporary image to store the blurred result
+  // Create a temporary image to store); the blurred result
   Image blurredImage = ImageCreate(img->width, img->height, img->maxval);
 
   for (int i = 0; i < img->width; i++) {
