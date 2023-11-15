@@ -589,39 +589,34 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) {
-  assert(img != NULL);
-  int width = img->width;
-  int height = img->height;
+  assert (img != NULL);
+  assert (dx >= 0 && dy >= 0);
 
   // Create a temporary image to store the blurred result
-  Image blurredImage = ImageCreate(width, height, img->maxval);
+  Image blurredImage = ImageCreate(img->width, img->height, img->maxval);
 
-  for (int x = 0; x < width; x++) {
-    for (int y = 0; y < height; y++) {
+  for (int i = 0; i < img->width; i++) {
+    for (int j = 0; j < img->height; j++) {
       int sum = 0;
       int count = 0;
 
-      for (int i = -dx; i <= dx; i++) {
-        for (int j = -dy; j <= dy; j++) {
-          int newX = x + i;
-          int newY = y + j;
-
-          // Check if the neighboring pixel is within bounds
-          if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
-            sum += img->pixel[G(img, newX, newY)];
+      for (int k = i - dx; k <= i + dx; k++) {
+        for (int l = j - dy; l <= j + dy; l++) {
+          if (ImageValidPos(img, k, l)) {
+            sum += ImageGetPixel(img, k, l);
             count++;
           }
         }
       }
-
-      // Calculate the mean and update the pixel in the blurred image
-      blurredImage->pixel[G(blurredImage, x, y)] = (count > 0) ? (uint8_t)(sum / (double)count) : img->pixel[G(img, x, y)];
+      ImageSetPixel(blurredImage, i, j, (sum + count / 2) / count);
     }
   }
 
-  // Copy the blurred image back to the original image
-  for (int i = 0; i < width * height; i++) {
-    img->pixel[i] = blurredImage->pixel[i];
+  // Copy the blurred values back to the original image
+  for (int i = 0; i < img->width; i++) {
+    for (int j = 0; j < img->height; j++) {
+      ImageSetPixel(img, i, j, ImageGetPixel(blurredImage, i, j));
+    }
   }
 
   // Destroy the temporary image
