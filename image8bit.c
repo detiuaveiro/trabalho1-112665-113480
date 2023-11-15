@@ -588,42 +588,44 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// Each pixel is substituted by the mean of the pixels in the rectangle
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
+#include <math.h>
+
 void ImageBlur(Image img, int dx, int dy) {
-  assert(img != NULL);
-  int width = img->width;
-  int height = img->height;
+    assert(img != NULL);
 
-  // Create a temporary image to store the blurred result
-  Image blurredImage = ImageCreate(width, height, img->maxval);
+    int width = img->width;
+    int height = img->height;
 
-  for (int x = 0; x < width; x++) {
-    for (int y = 0; y < height; y++) {
-      int sum = 0;
-      int count = 0;
+    Image tempImage = ImageCreate(width, height, img->maxval);
 
-      for (int i = -dx; i <= dx; i++) {
-        for (int j = -dy; j <= dy; j++) {
-          int newX = x + i;
-          int newY = y + j;
+    for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            int sum = 0;
+            int count = 0;
 
-          // Check if the neighboring pixel is within bounds
-          if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
-            sum += img->pixel[G(img, newX, newY)];
-            count++;
-          }
+            for (int i = -dx; i <= dx; i++) {
+                for (int j = -dy; j <= dy; j++) {
+                    int newX = x + i;
+                    int newY = y + j;
+
+                    // Verificar se o pixel vizinho está dentro dos limites
+                    if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
+                        sum += img->pixel[G(img, newX, newY)];
+                        count++;
+                    }
+                }
+            }
+
+            // Calcular a média e realizar o arredondamento manualmente
+            tempImage->pixel[G(tempImage, x, y)] = (count > 0) ? (uint8_t)((sum + count / 2) / count) : img->pixel[G(img, x, y)];
         }
-      }
-
-      // Calculate the mean and update the pixel in the blurred image
-      blurredImage->pixel[G(blurredImage, x, y)] = (count > 0) ? (uint8_t)(sum / (double)count) : img->pixel[G(img, x, y)];
     }
-  }
 
-  // Copy the blurred image back to the original image
-  for (int i = 0; i < width * height; i++) {
-    img->pixel[i] = blurredImage->pixel[i];
-  }
+    // Copiar a imagem temporária de volta para a imagem original
+    for (int i = 0; i < width * height; i++) {
+        img->pixel[i] = tempImage->pixel[i];
+    }
 
-  // Destroy the temporary image
-  ImageDestroy(&blurredImage);
+    // Destruir a imagem temporária
+    ImageDestroy(&tempImage);
 }
