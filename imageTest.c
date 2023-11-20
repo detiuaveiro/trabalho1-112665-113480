@@ -35,9 +35,15 @@ int main(int argc, char* argv[]) {
   int *x = malloc(sizeof(int));
   int *y  = malloc(sizeof(int));
   ImageLocateSubImage(img1, x, y, cp1);
-  int final = PIXMEM;
-  int total = final - inicial;
-  InstrPrint(); // to print instrumentation
+  InstrPrint(); 
+  
+  InstrReset();
+  printf("# NORMAL BLUR image");
+  ImageBlur(cp1,)
+  
+  
+  
+  // to print instrumentation
   // Try changing the behaviour of the program by commenting/uncommenting
   // the appropriate lines.
 

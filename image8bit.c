@@ -579,6 +579,7 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   for (int i = 0; i < img1->width - img2->width; i++){
     for (int j = 0; j < img1->height - img2->height; j++){
       if (ImageMatchSubImage(img1, i, j, img2)){
+        PIXMEM +=1;
         *px = i;
         *py = j;
         return 1;
@@ -607,6 +608,7 @@ void ImageBlur(Image img, int dx, int dy) {
       for (int k = i - dx; k <= i + dx; k++) {
         for (int l = j - dy; l <= j + dy; l++) {
           if (ImageValidPos(img, k, l)) {
+            PIXMEM += 1; 
             sum += ImageGetPixel(img, k, l);
             count++;
           }
