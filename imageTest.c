@@ -1,14 +1,3 @@
-// imageTest - A program that performs some image processing.
-//
-// This program is an example use of the image8bit module,
-// a programming project for the course AED, DETI / UA.PT
-//
-// You may freely use and modify this code, NO WARRANTY, blah blah,
-// as long as you give proper credit to the original and subsequent authors.
-//
-// João Manuel Rodrigues <jmr@ua.pt>
-// 2023
-
 #include <assert.h>
 #include <errno.h>
 #include "error.h"
@@ -17,6 +6,7 @@
 #include <string.h>
 #include "image8bit.h"
 #include "instrumentation.h"
+
 #define PIXMEM InstrCount[0]
 #define PIXCOMP InstrCount[1]
 
@@ -26,42 +16,49 @@ int main(int argc, char* argv[]) {
   }
 
   ImageInit();
-  
+
   printf("# LOAD image");
-  InstrReset(); // to reset instrumentation
+  InstrReset(); // Reset instrumentation
   Image img1 = ImageLoad(argv[1]);
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img1), ImageWidth(img1));
+
+  printf("\n# CROP image");
   Image cp1 = ImageCrop(img1, 0, 0, 150, 150);
-  int inicial = PIXMEM;
-  int *x = malloc(sizeof(int));
-  int *y  = malloc(sizeof(int));
-  ImageLocateSubImage(img1, x, y, cp1);
-  InstrPrint(); 
-  
-  InstrReset();
-  printf("# NORMAL BLUR image");
-  ImageBlur(cp1,)
-  
-  
-  
-  // to print instrumentation
-  // Try changing the behaviour of the program by commenting/uncommenting
-  // the appropriate lines.
+  printf("\nCropped Image - Height: %d, Width: %d\n", ImageHeight(cp1), ImageWidth(cp1));
 
-  //img2 = ImageCrop(img1, ImageWidth(img1)/4, ImageHeight(img1)/4, ImageWidth(img1)/2, ImageHeight(img1)/2);
-  //Image img2 = ImageRotate(img1);
-  //if (img2 == NULL) {
-  //  error(2, errno, "Rotating img2: %s", ImageErrMsg());
-  //}
+  printf("\n# LOCATE subimage");
+  int x, y;
+  InstrReset(); // Reset instrumentation
+  if (ImageLocateSubImage(img1, &x, &y, cp1)) {
+    printf("\nSubimage found at coordinates - x: %d, y: %d\n", x, y);
+  } else {
+    printf("\nSubimage not found.\n");
+  }
+  InstrPrint(); // Print instrumentation
+  // Free memory
+  ImageDestroy(&img1);
+  ImageDestroy(&cp1);
 
-  //ImageNegative(img2);
-  //ImageThreshold(img2, 100);
-  //ImageBrighten(img2, 1.3);
-  //if (ImageSave(img2, argv[2]) == 0) {
-   // error(2, errno, "%s: %s", argv[2], ImageErrMsg());
-  //}
+  ///// New set of images
+  Image img2 = ImageLoad(argv[1]);
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img2), ImageWidth(img2));
 
-  //ImageDestroy(&img1);
-  //ImageDestroy(&img2);
+  printf("\n# CROP image");
+  Image cp2 = ImageCrop(img2, 150, 150, 150, 150);
+  printf("\nCropped Image - Height: %d, Width: %d\n", ImageHeight(cp2), ImageWidth(cp2));
+
+  printf("\n# LOCATE subimage");
+  int x2, y2;
+  InstrReset(); // Reset instrumentation
+  if (ImageLocateSubImage(img2, &x2, &y2, cp2)) {
+    printf("\nSubimage found at coordinates - x: %d, y: %d\n", x2, y2);
+  } else {
+    printf("\nSubimage not found.\n");
+  }
+  InstrPrint(); // Print instrumentation
+  // Free memory
+  ImageDestroy(&img2);
+  ImageDestroy(&cp2);
+
   return 0;
 }
-

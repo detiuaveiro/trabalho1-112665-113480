@@ -345,6 +345,7 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
   int index = y * img->width + x;
+  PIXMEM += 1;  // count one pixel access (read or store)
   assert (0 <= index && index < img->width*img->height);
   return index;
 }
@@ -353,7 +354,6 @@ static inline int G(Image img, int x, int y) {
 uint8 ImageGetPixel(Image img, int x, int y) { ///
   assert (img != NULL);
   assert (ImageValidPos(img, x, y));
-  PIXMEM += 1;  // count one pixel access (read)
   return img->pixel[G(img, x, y)];
 } 
 
@@ -361,7 +361,6 @@ uint8 ImageGetPixel(Image img, int x, int y) { ///
 void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
   assert (img != NULL);
   assert (ImageValidPos(img, x, y));
-  PIXMEM += 1;  // count one pixel access (store)
   img->pixel[G(img, x, y)] = level;
 } 
 
@@ -402,17 +401,14 @@ void ImageThreshold(Image img, uint8 thr) { ///
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   assert( factor > 0.0);
-
-  for (int i = 0; i < img->width * img->height; i++){
-    
-    img->pixel[i] = (uint8)(img->pixel[i] * factor + 0.5);
-    if (img->pixel[i] > img->maxval){
-       img->pixel[i] = img->maxval;
-       PIXMEM +=1;
+  for (int x = 0; x < img->width; x++) {
+    for (int y = 0; y < img->height; y++) {
+      int index = G(img, x, y);
+      img->pixel[index] = (uint8)(img->pixel[index] * factor + 0.5);
+      if (img->pixel[index] > img->maxval) img->pixel[index] = img->maxval;
     }
   }
 }
-
 
 /// Geometric transformations
 
@@ -562,7 +558,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   for (int i = 0; i < img2-> width; i++){
     for (int j = 0; j < img2->height; j++){
-      if (img1->pixel[G(img1, x + i, y + j)] != img2->pixel[G(img2, i, j)]) return 0;
+      if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]) return 0;
     }
   }
   return 1;
