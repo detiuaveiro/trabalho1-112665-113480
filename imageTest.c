@@ -17,9 +17,10 @@
 #include <string.h>
 #include "image8bit.h"
 #include "instrumentation.h"
+#define PIXMEM InstrCount[0]
+#define PIXCOMP InstrCount[1]
 
 int main(int argc, char* argv[]) {
-  program_name = argv[0];
   if (argc != 3) {
     error(1, 0, "Usage: imageTest input.pgm output.pgm");
   }
@@ -29,18 +30,14 @@ int main(int argc, char* argv[]) {
   printf("# LOAD image");
   InstrReset(); // to reset instrumentation
   Image img1 = ImageLoad(argv[1]);
-  Image img2 = ImageLoad(argv[2]);
-  int inicial = InstrCount[0];
-  int* x, y;
-  ImageLocateSubImage(img1, img2, &x, &y);
-  int final = InstrCount[0];
+  Image cp1 = ImageCrop(img1, 0, 0, 150, 150);
+  int inicial = PIXMEM;
+  int *x = malloc(sizeof(int));
+  int *y  = malloc(sizeof(int));
+  ImageLocateSubImage(img1, x, y, cp1);
+  int final = PIXMEM;
   int total = final - inicial;
-  printf("%d", total);
-  // if (img1 == NULL) {
-  //  error(2, errno, "Loading %s: %s" , argv[1], ImageErrMsg());
-  //}
-  // InstrPrint(); // to print instrumentation
-
+  InstrPrint(); // to print instrumentation
   // Try changing the behaviour of the program by commenting/uncommenting
   // the appropriate lines.
 
