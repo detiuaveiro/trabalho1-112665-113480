@@ -146,7 +146,7 @@ static int check(int condition, const char* failmsg) {
 void ImageInit(void) { ///
   InstrCalibrate();
   InstrName[0] = "pixmem";
-  InstrName[1] = "pixcmp"  // InstrCount[0] will count pixel array acesses
+  InstrName[1] = "pixcmp";  // InstrCount[0] will count pixel array acesses
   // Name other counters here...
   
 }
@@ -607,7 +607,6 @@ void ImageBlur(Image img, int dx, int dy) {
       for (int k = i - dx; k <= i + dx; k++) {
         for (int l = j - dy; l <= j + dy; l++) {
           if (ImageValidPos(img, k, l)) {
-            PIXMEM += 1; 
             sum += ImageGetPixel(img, k, l);
             count++;
           }
