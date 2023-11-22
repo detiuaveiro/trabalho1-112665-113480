@@ -11,9 +11,7 @@
 #define PIXCOMP InstrCount[1]
 
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    error(1, 0, "Usage: imageTest input.pgm output.pgm");
-  }
+  
 
   ImageInit();
 
