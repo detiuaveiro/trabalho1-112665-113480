@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img2), ImageWidth(img2));
 
   printf("\n# CROP image");
-  Image cp2 = ImageCrop(img2, 150, 150, 150, 150);
+  Image cp2 = ImageCrop(img2, 150, 150, 149, 149);
   printf("\nCropped Image - Height: %d, Width: %d\n", ImageHeight(cp2), ImageWidth(cp2));
 
   printf("\n# LOCATE subimage");
