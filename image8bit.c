@@ -145,13 +145,15 @@ static int check(int condition, const char* failmsg) {
 /// Currently, simply calibrate instrumentation and set names of counters.
 void ImageInit(void) { ///
   InstrCalibrate();
-  InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
+  InstrName[0] = "pixmem";
+  InstrName[1] = "pixcmp"  // InstrCount[0] will count pixel array acesses
   // Name other counters here...
   
 }
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
+#define PIXCMP InstrCount[1]
 // Add more macros here...
 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
@@ -558,6 +560,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   for (int i = 0; i < img2-> width; i++){
     for (int j = 0; j < img2->height; j++){
+      PIXCMP +=1;
       if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]) return 0;
     }
   }
@@ -574,8 +577,8 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   // Insert your code here!
   for (int i = 0; i < img1->width - img2->width; i++){
     for (int j = 0; j < img1->height - img2->height; j++){
+      PIXCMP +=1;
       if (ImageMatchSubImage(img1, i, j, img2)){
-        PIXMEM +=1;
         *px = i;
         *py = j;
         return 1;
