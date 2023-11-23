@@ -34,7 +34,6 @@ int main(int argc, char* argv[]) {
   }
   InstrPrint(); // Print instrumentation
   // Free memory
-  ImageDestroy(&img1);
   ImageDestroy(&cp1);
 
   ///// New set of images
@@ -230,12 +229,12 @@ int main(int argc, char* argv[]) {
   // Free memory
   ImageDestroy(&img11);
   ImageDestroy(&cp11);
-  Image img12 = ImageCreate(512,512,255);
-  ImageSetPixel(img12,511,511,255);
+  Image img12 = ImageCreate(2000,2000,255);
+  ImageSetPixel(img12,1999,1999,255);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img12), ImageWidth(img12));
 
   printf("\n# CROP image - New image has coordinates (511, 511) and 1x1 size which will be _____ of the original image.");
-  Image cp12 = ImageCrop(img12, 511, 511, 1, 1);
+  Image cp12 = ImageCrop(img12, 1999, 1999, 1, 1);
   printf("\nCropped Image - Height: %d, Width: %d\n", ImageHeight(cp12), ImageWidth(cp12));
 
   printf("\n# LOCATE subimage");
@@ -253,8 +252,8 @@ int main(int argc, char* argv[]) {
   Image img13 = ImageLoad(argv[3]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img13), ImageWidth(img13));
 
-  printf("\n# CROP image - New image has coordinates (511, 511) and 1x1 size which will be _____ of the original image.");
-  Image cp13 = ImageCrop(img13, 1, 1, 1, 1);
+  printf("\n# CROP image - New image has coordinates (1500, 1500) and 100x100 size which will be  of the original image.");
+  Image cp13 = ImageCrop(img13, 1575, 1175, 25, 25);
   printf("\nCropped Image - Height: %d, Width: %d\n", ImageHeight(cp13), ImageWidth(cp13));
 
   printf("\n# LOCATE subimage");
@@ -269,5 +268,33 @@ int main(int argc, char* argv[]) {
   // Free memory
   ImageDestroy(&img13);
   ImageDestroy(&cp13);
+  int px, py;
+      printf("# Teste da função ImageLocateSubImage\n");
+
+    //criar uma imagem branca com o pixel ultimo pixel preto
+    Image branca = ImageCrop(img1, 0, 0, ImageWidth(img1), ImageHeight(img1));
+    ImageThreshold(branca, 0);
+
+    //ciclo para criar varias janelas e testar a função
+    for (int width = 1; width < ImageWidth(branca); width*=2) {
+      //criar uma janela para o melhor cenário
+      Image subBest = ImageCrop(branca, 0, 0, width, width);
+
+      //criar uma janela para o pior cenário
+      Image subWorst = ImageCrop(branca, 0, 0, width, width);
+      ImageSetPixel(subWorst, ImageWidth(subWorst)-1, ImageHeight(subWorst)-1, 0);
+
+      InstrReset(); // to reset instrumentation
+      printf("\n# IMAGELOCATESUBIMAGE BEST CASE (size: %d)\n", width);
+      ImageLocateSubImage(branca, &px, &py, subBest);
+      InstrPrint();
+
+      InstrReset(); // to reset instrumentation
+      printf("\n# IMAGELOCATESUBIMAGE WORST CASE (size: %d)\n", width);
+      ImageLocateSubImage(branca, &px, &py, subWorst);
+      InstrPrint();
+
+      printf("\n");
   return 0;
+}
 }
