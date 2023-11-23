@@ -251,7 +251,7 @@ int main(int argc, char* argv[]) {
   ImageDestroy(&img12);
   ImageDestroy(&cp12);
   Image img13 = ImageLoad(argv[3]);
-  ImageSetPixel(img13,511,511,255);
+ 
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img13), ImageWidth(img13));
 
   printf("\n# CROP image - New image has coordinates (511, 511) and 1x1 size which will be _____ of the original image.");

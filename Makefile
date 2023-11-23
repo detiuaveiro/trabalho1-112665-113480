@@ -75,6 +75,7 @@ test9: $(PROGS) setup
 
 test10: $(PROGS) setup
 	./imageTest ./test/original.pgm ./pgm/medium/mandrill_512x512.pgm ./pgm/large/ireland_03_1600x1200.pgm
+	
 
 	
 
