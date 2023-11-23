@@ -623,7 +623,7 @@ void OldImageBlur(Image img, int dx, int dy) {
 
   ImageDestroy(&blurredImage); //destrói a imagem
 }
- void ImageBlur(Image img, int dx, int dy){
+void ImageBlur(Image img, int dx, int dy){
   int* valuesum;
   int blurval, xstart, xend, ystart, yend, xSize, ySize, count;
   valuesum = (uint8*) malloc(sizeof(uint8*) * img->height * img->width);
