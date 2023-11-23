@@ -565,7 +565,6 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
       if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]) return 0;
     }
   }
-  return 1;
 }
 
 /// Locate a subimage inside another image.
