@@ -275,26 +275,22 @@ int main(int argc, char* argv[]) {
     ImageThreshold(branca, 0);
 
     //ciclo para criar varias janelas e testar a função
-    for (int width = 1; width < ImageWidth(branca); width*=2) {
-      //criar uma janela para o melhor cenário
-      Image subBest = ImageCrop(branca, 0, 0, width, width);
-
-      //criar uma janela para o pior cenário
-      Image subWorst = ImageCrop(branca, 0, 0, width, width);
-      ImageSetPixel(subWorst, ImageWidth(subWorst)-1, ImageHeight(subWorst)-1, 0);
-
-      InstrReset(); // to reset instrumentation
-      printf("\n# IMAGELOCATESUBIMAGE BEST CASE (size: %d)\n", width);
-      ImageLocateSubImage(branca, &px, &py, subBest);
-      InstrPrint();
-
-      InstrReset(); // to reset instrumentation
-      printf("\n# IMAGELOCATESUBIMAGE WORST CASE (size: %d)\n", width);
-      ImageLocateSubImage(branca, &px, &py, subWorst);
-      InstrPrint();
-
-      printf("\n");
-    }
+  for (int width = 1; width < ImageWidth(branca); width*=2) {
+    //criar uma janela para o melhor cenário
+    Image subBest = ImageCrop(branca, 0, 0, width, width);  
+    //criar uma janela para o pior cenário
+    Image subWorst = ImageCrop(branca, 0, 0, width, width);
+    ImageSetPixel(subWorst, ImageWidth(subWorst)-1, ImageHeight(subWorst)-1, 0);  
+    InstrReset(); // to reset instrumentation
+    printf("\n# IMAGELOCATESUBIMAGE BEST CASE (size: %d)\n", width);
+    ImageLocateSubImage(branca, &px, &py, subBest);
+    InstrPrint();  
+    InstrReset(); // to reset instrumentation
+    printf("\n# IMAGELOCATESUBIMAGE WORST CASE (size: %d)\n", width);
+    ImageLocateSubImage(branca, &px, &py, subWorst);
+    InstrPrint();  
+    printf("\n");
+  }
   Image img14 = ImageLoad(argv[1]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img14), ImageWidth(img14));
   ImageBlur(img14,5,5);
