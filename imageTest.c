@@ -316,7 +316,7 @@ int main(int argc, char* argv[]) {
   InstrPrint();
 
 
-  #tomas
+  //tomas
   return 0;
 
 }
