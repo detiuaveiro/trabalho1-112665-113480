@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "instrumentation.h"
-
+#define NDEBUG
 // The data structure
 //
 // An image is stored in a structure containing 3 fields:
@@ -334,7 +334,6 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   return (0 <= x && x+w <= img->width) && (0 <= y && y+h <= img->height);
 }
-
 /// Pixel get & set operations
 
 /// These are the primitive operations to access and modify a single pixel
@@ -347,7 +346,6 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
   int index = y * img->width + x;
-  PIXMEM += 1;  // count one pixel access (read or store)
   assert (0 <= index && index < img->width*img->height);
   return index;
 }
@@ -560,7 +558,8 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   for (int i = 0; i < img2-> width; i++){
     for (int j = 0; j < img2->height; j++){
-      PIXCMP +=1;
+      PIXCMP += 1;
+      PIXMEM += 2;
       if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]) return 0;
     }
   }
@@ -575,8 +574,8 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   // Insert your code here!
-  for (int i = 0; i < img1->width - img2->width; i++){
-    for (int j = 0; j < img1->height - img2->height; j++){
+  for (int i = 0; i <= img1->width - img2->width; i++){
+    for (int j = 0; j <= img1->height - img2->height; j++){
       PIXCMP +=1;
       if (ImageMatchSubImage(img1, i, j, img2)){
         *px = i;
@@ -592,15 +591,15 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// Each pixel is substituted by the mean of the pixels in the rectangle
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
-void ImageBlur(Image img, int dx, int dy) {
+void OldImageBlur(Image img, int dx, int dy) {
   assert (img != NULL);
   assert (dx >= 0 && dy >= 0);
 
   // Create a temporary image to store the blurred result
   Image blurredImage = ImageCreate(img->width, img->height, img->maxval);
 
-  for (int i = 0; i < img->width; i++) {
-    for (int j = 0; j < img->height; j++) {
+  for (int i = 0; i <= img->width; i++) {
+    for (int j = 0; j <= img->height; j++) {
       int sum = 0;
       int count = 0;
 
@@ -616,14 +615,60 @@ void ImageBlur(Image img, int dx, int dy) {
       ImageSetPixel(blurredImage, i, j, (sum + count / 2) / count);
     }
   }
-
-  // Copy the blurred values back to the original image
-  for (int i = 0; i < img->width; i++) {
+    for (int i = 0; i < img->width; i++) {
     for (int j = 0; j < img->height; j++) {
       ImageSetPixel(img, i, j, ImageGetPixel(blurredImage, i, j));
     }
   }
 
-  // Destroy the temporary image
-  ImageDestroy(&blurredImage);
+  ImageDestroy(&blurredImage); //destrói a imagem
+}
+ void ImageBlur(Image img, int dx, int dy){
+  int* valuesum;
+  int blurval, xstart, xend, ystart, yend, xSize, ySize, count;
+  valuesum = (uint8*) malloc(sizeof(uint8*) * img->height * img->width);
+
+  if(check(valuesum != NULL, "Failed memory allocation")){
+    for (int x = 0; x < img->width; x++){
+      for (int y = 0; y < img->height; y++){
+        PIXCMP += 4;
+        int currentPixel = ImageGetPixel(img, x, y);
+        int leftPixelSum = (x > 0) ? valuesum[G(img, x - 1, y)] : 0;
+        int abovePixelSum = (y > 0) ? valuesum[G(img, x, y - 1)] : 0;
+        int diagonalPixelSum = (x > 0 && y > 0) ? valuesum[G(img, x - 1, y - 1)] : 0;
+
+        if (x > 0 && y > 0) {
+            valuesum[G(img, x, y)] = currentPixel + leftPixelSum + abovePixelSum - diagonalPixelSum;
+        }
+        else if (x > 0) {
+            valuesum[G(img, x, y)] = currentPixel + leftPixelSum + abovePixelSum;
+        }
+        else if (y > 0) {
+            valuesum[G(img, x, y)] = currentPixel + abovePixelSum;
+        }
+        else {
+            valuesum[G(img, x, y)] = currentPixel;
+        }   
+      }
+    }
+    for (int x = 0; x < img->width; x++){
+      for (int y = 0; y < img->height; y++){
+        PIXCMP += 8;
+        xstart = (x - dx) > 0 ? (x - dx) : 0;
+        ystart = (y - dy) > 0 ? (y - dy) : 0;
+        xend = (x + dx) < img->width ? (x + dx) : (img->width - 1);
+        yend = (y + dy) < img->height ? (y + dy) : (img->height - 1);
+        xSize = xend - xstart + 1;
+        ySize = yend - ystart + 1;
+        count = ySize * xSize;
+        blurval = valuesum[G(img, xend, yend)] - ((ystart > 0) ? valuesum[G(img, xend, ystart - 1)] : 0) - ((xstart > 0) ? valuesum[G(img, xstart - 1, yend)] : 0) + ((xstart > 0 && ystart > 0) ? valuesum[G(img, xstart - 1, ystart - 1)] : 0);
+        blurval = (blurval + count / 2)/count;
+        ImageSetPixel(img, x, y, blurval);
+      }
+    }
+  }
+  
+  else {
+    free(valuesum); //destroi a imagem
+  }
 }
