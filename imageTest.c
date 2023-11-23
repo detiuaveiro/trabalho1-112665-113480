@@ -113,7 +113,6 @@ int main(int argc, char* argv[]) {
   }
   InstrPrint(); // Print instrumentation
   // Free memory
-  ImageDestroy(&img5);
   ImageDestroy(&cp5);
   Image img6 = ImageLoad(argv[2]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img6), ImageWidth(img6));
@@ -268,7 +267,57 @@ int main(int argc, char* argv[]) {
   // Free memory
   ImageDestroy(&img13);
   ImageDestroy(&cp13);
+  int px, py;
+      printf("# Teste da função ImageLocateSubImage\n");
+
+    //criar uma imagem branca com o pixel ultimo pixel preto
+    Image branca = ImageCrop(img5, 0, 0, ImageWidth(img1), ImageHeight(img1));
+    ImageThreshold(branca, 0);
+
+    //ciclo para criar varias janelas e testar a função
+    for (int width = 1; width < ImageWidth(branca); width*=2) {
+      //criar uma janela para o melhor cenário
+      Image subBest = ImageCrop(branca, 0, 0, width, width);
+
+      //criar uma janela para o pior cenário
+      Image subWorst = ImageCrop(branca, 0, 0, width, width);
+      ImageSetPixel(subWorst, ImageWidth(subWorst)-1, ImageHeight(subWorst)-1, 0);
+
+      InstrReset(); // to reset instrumentation
+      printf("\n# IMAGELOCATESUBIMAGE BEST CASE (size: %d)\n", width);
+      ImageLocateSubImage(branca, &px, &py, subBest);
+      InstrPrint();
+
+      InstrReset(); // to reset instrumentation
+      printf("\n# IMAGELOCATESUBIMAGE WORST CASE (size: %d)\n", width);
+      ImageLocateSubImage(branca, &px, &py, subWorst);
+      InstrPrint();
+
+      printf("\n");
+    }
+  Image img14 = ImageLoad(argv[1]);
+  InstrReset();
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img14), ImageWidth(img14));
+  
+  ImageBlur(img14,5,5);
+  InstrReset();
+  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img14), ImageWidth(img14));
+  InstrPrint();
+
+  Image img15 = ImageLoad(argv[1]);
+  InstrReset();
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img15), ImageWidth(img15));
+  ImageBlur(img15,20,20);
+  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img15), ImageWidth(img15));
+  InstrPrint();
+
+  Image img16 = ImageLoad(argv[1]);
+  InstrReset();
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img16), ImageWidth(img16));
+  ImageBlur(img16,40,40);
+  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img16), ImageWidth(img16));
+  InstrPrint();
+
   return 0;
 
-}
 }
