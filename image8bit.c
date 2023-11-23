@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "instrumentation.h"
-#define NDEBUG
 // The data structure
 //
 // An image is stored in a structure containing 3 fields:
@@ -557,7 +556,6 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
-  assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   for (int i = 0; i < img2-> width; i++){
     for (int j = 0; j < img2->height; j++){
       PIXCMP += 1;
@@ -571,21 +569,22 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 /// Searches for img2 inside img1.
 /// If a match is found, returns 1 and matching position is set in vars (*px, *py).
 /// If no match is found, returns 0 and (*px, *py) are left untouched.
-int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
-  assert (img1 != NULL);
-  assert (img2 != NULL);
-  // Insert your code here!
-  for (int i = 0; i <= img1->width - img2->width; i++){
-    for (int j = 0; j <= img1->height - img2->height; j++){
-      if (ImageMatchSubImage(img1, i, j, img2)){
-        *px = i;
-        *py = j;
-        return 1;
-      }
+int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) {
+    assert(img1 != NULL);
+    assert(img2 != NULL);
+
+    for (int i = 0; i <= img1->width - img2->width; i++) {
+        for (int j = 0; j <= img1->height - img2->height; j++) {
+            if (ImageMatchSubImage(img1, i, j, img2)) {
+                *px = i;
+                *py = j;
+                return 1;
+            }
+        }
     }
-  }
-  return 0;
+    return 0;
 }
+
 ///filtering
 /// Blur an image by a applying a (2dx+1)x(2dy+1) mean filter.
 /// Each pixel is substituted by the mean of the pixels in the rectangle
