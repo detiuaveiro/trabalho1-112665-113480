@@ -354,6 +354,7 @@ static inline int G(Image img, int x, int y) {
 uint8 ImageGetPixel(Image img, int x, int y) { ///
   assert (img != NULL);
   assert (ImageValidPos(img, x, y));
+  PIXMEM++;
   return img->pixel[G(img, x, y)];
 } 
 
@@ -361,6 +362,7 @@ uint8 ImageGetPixel(Image img, int x, int y) { ///
 void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
   assert (img != NULL);
   assert (ImageValidPos(img, x, y));
+  PIXMEM++;
   img->pixel[G(img, x, y)] = level;
 } 
 
@@ -631,7 +633,6 @@ void OldImageBlur(Image img, int dx, int dy) {
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
         PIXCMP += 4;
-        PIXMEM += 1;
         int currentPixel = ImageGetPixel(img, x, y);
         int leftPixelSum = (x > 0) ? valuesum[G(img, x - 1, y)] : 0;
         int abovePixelSum = (y > 0) ? valuesum[G(img, x, y - 1)] : 0;
@@ -654,7 +655,6 @@ void OldImageBlur(Image img, int dx, int dy) {
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
         PIXCMP += 8;
-        PIXMEM += 1;
         xstart = (x - dx) > 0 ? (x - dx) : 0;
         ystart = (y - dy) > 0 ? (y - dy) : 0;
         xend = (x + dx) < img->width ? (x + dx) : (img->width - 1);
