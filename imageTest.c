@@ -251,11 +251,10 @@ int main(int argc, char* argv[]) {
   ImageDestroy(&img12);
   ImageDestroy(&cp12);
   Image img13 = ImageLoad(argv[3]);
- 
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img13), ImageWidth(img13));
 
   printf("\n# CROP image - New image has coordinates (511, 511) and 1x1 size which will be _____ of the original image.");
-  Image cp13 = ImageCrop(img12, 511, 511, 1, 1);
+  Image cp13 = ImageCrop(img13, 1, 1, 1, 1);
   printf("\nCropped Image - Height: %d, Width: %d\n", ImageHeight(cp13), ImageWidth(cp13));
 
   printf("\n# LOCATE subimage");
@@ -271,9 +270,4 @@ int main(int argc, char* argv[]) {
   ImageDestroy(&img13);
   ImageDestroy(&cp13);
   return 0;
-
-  Image img14 = ImageLoad(argv[1]);
-  ImageBlur(img14,5,5);
-  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img14), ImageWidth(img14));
-
 }
