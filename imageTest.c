@@ -271,4 +271,9 @@ int main(int argc, char* argv[]) {
   ImageDestroy(&img13);
   ImageDestroy(&cp13);
   return 0;
+
+  Image img14 = ImageLoad(argv[1]);
+  ImageBlur(img14,5,5);
+  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img14), ImageWidth(img14));
+
 }

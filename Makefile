@@ -74,7 +74,8 @@ test9: $(PROGS) setup
 	cmp blur.pgm test/blur.pgm
 
 test10: $(PROGS) setup
-	./imageTest test/original.pgm 
+	./imageTest ./test/original.pgm ./pgm/medium/mandrill_512x512.pgm ./pgm/large/ireland_03_1600x1200.pgm
+
 	
 
 .PHONY: tests
