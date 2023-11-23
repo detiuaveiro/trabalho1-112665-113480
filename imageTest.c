@@ -298,7 +298,7 @@ int main(int argc, char* argv[]) {
   printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img17), ImageWidth(img17));
   InstrPrint();
 
-  
+  #tomas
   return 0;
 
 }
