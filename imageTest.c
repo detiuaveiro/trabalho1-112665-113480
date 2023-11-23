@@ -269,5 +269,32 @@ int main(int argc, char* argv[]) {
   // Free memory
   ImageDestroy(&img13);
   ImageDestroy(&cp13);
+
+  Image img14 = ImageLoad(argv[1]);
+  InstrReset();
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img14), ImageWidth(img14));
+  
+  ImageBlur(img14,5,5);
+  InstrReset();
+  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img14), ImageWidth(img14));
+  InstrPrint();
+
+  Image img15 = ImageLoad(argv[1]);
+  InstrReset();
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img15), ImageWidth(img15));
+  ImageBlur(img15,20,20);
+  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img15), ImageWidth(img15));
+  InstrPrint();
+
+  Image img16 = ImageLoad(argv[1]);
+  InstrReset();
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img16), ImageWidth(img16));
+  ImageBlur(img16,40,40);
+  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img16), ImageWidth(img16));
+  InstrPrint();
+
+
+  
   return 0;
+
 }
