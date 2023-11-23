@@ -556,7 +556,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-  for (int i = 0; i < img2->width; i++){
+  for (int i = 0; i < img2-> width; i++){
     for (int j = 0; j < img2->height; j++){
       PIXCMP += 1;
       PIXMEM += 2;
@@ -576,7 +576,6 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   // Insert your code here!
   for (int i = 0; i <= img1->width - img2->width; i++){
     for (int j = 0; j <= img1->height - img2->height; j++){
-      PIXCMP +=1;
       if (ImageMatchSubImage(img1, i, j, img2)){
         *px = i;
         *py = j;
@@ -632,6 +631,7 @@ void OldImageBlur(Image img, int dx, int dy) {
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
         PIXCMP += 4;
+        PIXMEM += 1;
         int currentPixel = ImageGetPixel(img, x, y);
         int leftPixelSum = (x > 0) ? valuesum[G(img, x - 1, y)] : 0;
         int abovePixelSum = (y > 0) ? valuesum[G(img, x, y - 1)] : 0;
@@ -654,6 +654,7 @@ void OldImageBlur(Image img, int dx, int dy) {
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
         PIXCMP += 8;
+        PIXMEM += 1;
         xstart = (x - dx) > 0 ? (x - dx) : 0;
         ystart = (y - dy) > 0 ? (y - dy) : 0;
         xend = (x + dx) < img->width ? (x + dx) : (img->width - 1);
