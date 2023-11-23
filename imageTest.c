@@ -330,24 +330,24 @@ int main(int argc, char* argv[]) {
   InstrReset();
   Image img20 = ImageLoad(argv[1]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img20), ImageWidth(img20));
-  OldImageBlur(img20,20,20);
+  OldImageBlur(img20,40,40);
   printf("\nOldBlurred Image - Height: %d, Width: %d\n", ImageHeight(img20), ImageWidth(img20));
   InstrPrint();
 
   InstrReset();
-  Image img17 = ImageLoad(argv[3]);
+  Image img17 = ImageLoad(argv[2]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img17), ImageWidth(img17));
-  ImageBlur(img17,1000,400);
+  ImageBlur(img17,500,400);
   printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img17), ImageWidth(img17));
   InstrPrint();
 
   InstrReset();
-  Image img21 = ImageLoad(argv[3]);
+  Image img21 = ImageLoad(argv[2]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img21), ImageWidth(img21));
-  OldImageBlur(img21,1000,400);
+  OldImageBlur(img21,50,20);
   printf("\nOldBlurred Image - Height: %d, Width: %d\n", ImageHeight(img21), ImageWidth(img21));
   InstrPrint();
-  
+  //funciona se forem valores de dx e dy baixo tipo 50,20 se for 500 200 fica bue tempo e nao corre
   return 0;
 
 }
