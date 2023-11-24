@@ -596,8 +596,8 @@ void OldImageBlur(Image img, int dx, int dy) {
   assert (dx >= 0 && dy >= 0);
 
   // Create a temporary image to store the blurred result
-  Image blurredImage = ImageCreate(img->width, img->height, img->maxval);
-
+  Image blurredImage = ImageCreate(img->width+1, img->height+1, img->maxval);
+  ImagePaste(blurredImage,0, 0, img);
   for (int i = 0; i <= img->width; i++) {
     for (int j = 0; j <= img->height; j++) {
       int sum = 0;
@@ -623,7 +623,7 @@ void OldImageBlur(Image img, int dx, int dy) {
 
   ImageDestroy(&blurredImage); //destrói a imagem
 }
- void ImageBlur(Image img, int dx, int dy){
+void ImageBlur(Image img, int dx, int dy){
   int* valuesum;
   int blurval, xstart, xend, ystart, yend, xSize, ySize, count;
   valuesum = (uint8*) malloc(sizeof(uint8*) * img->height * img->width);
