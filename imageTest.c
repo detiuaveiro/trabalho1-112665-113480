@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
   }
   InstrPrint(); // Print instrumentation
   // Free memory
+  ImageDestroy(&img1);
   ImageDestroy(&cp1);
 
   ///// New set of images
@@ -113,6 +114,7 @@ int main(int argc, char* argv[]) {
   }
   InstrPrint(); // Print instrumentation
   // Free memory
+  ImageDestroy(&img5);
   ImageDestroy(&cp5);
   Image img6 = ImageLoad(argv[2]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img6), ImageWidth(img6));
@@ -233,7 +235,7 @@ int main(int argc, char* argv[]) {
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img12), ImageWidth(img12));
 
   printf("\n# CROP image - New image has coordinates (511, 511) and 1x1 size which will be _____ of the original image.");
-  Image cp12 = ImageCrop(img12, 1999, 1999, 1, 1);
+  Image cp12 = ImageCrop(img12, 0, 0, 2000, 2000);
   printf("\nCropped Image - Height: %d, Width: %d\n", ImageHeight(cp12), ImageWidth(cp12));
 
   printf("\n# LOCATE subimage");
@@ -270,8 +272,9 @@ int main(int argc, char* argv[]) {
   int px, py;
       printf("# Teste da função ImageLocateSubImage\n");
 
+  Image teste = ImageLoad(argv[2]);
     //criar uma imagem branca com o pixel ultimo pixel preto
-    Image branca = ImageCrop(img5, 0, 0, ImageWidth(img1), ImageHeight(img1));
+    Image branca = ImageCrop(teste, 0, 0, ImageWidth(teste), ImageHeight(teste));
     ImageThreshold(branca, 0);
 
     //ciclo para criar varias janelas e testar a função
@@ -290,12 +293,19 @@ int main(int argc, char* argv[]) {
     ImageLocateSubImage(branca, &px, &py, subWorst);
     InstrPrint();  
     printf("\n");
+    ImageDestroy(&subBest);
+    ImageDestroy(&subWorst);
   }
+  ImageDestroy(&branca);
+  ImageDestroy(&teste);
+
+
   Image img14 = ImageLoad(argv[1]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img14), ImageWidth(img14));
   ImageBlur(img14,5,5);
   printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img14), ImageWidth(img14));
   InstrPrint();
+  ImageDestroy(&img14);
 
   InstrReset();
   Image img15 = ImageLoad(argv[1]);
@@ -303,6 +313,7 @@ int main(int argc, char* argv[]) {
   ImageBlur(img15,20,20);
   printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img15), ImageWidth(img15));
   InstrPrint();
+  ImageDestroy(&img15);
 
   InstrReset();
   Image img16 = ImageLoad(argv[1]);
@@ -310,13 +321,16 @@ int main(int argc, char* argv[]) {
   ImageBlur(img16,40,40);
   printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img16), ImageWidth(img16));
   InstrPrint();
-    InstrReset();
+  ImageDestroy(&img16);
+  
+  InstrReset();
   Image img17 = ImageLoad(argv[3]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img17), ImageWidth(img17));
-  ImageBlur(img16,1000,400);
+  ImageBlur(img17,1000,400);
   printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img17), ImageWidth(img17));
   InstrPrint();
-  
+  ImageDestroy(&img17);
+
   return 0;
 
 }

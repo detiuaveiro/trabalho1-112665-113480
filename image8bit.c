@@ -563,6 +563,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
       if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]) return 0;
     }
   }
+  return 1;
 }
 
 /// Locate a subimage inside another image.
@@ -633,17 +634,17 @@ void OldImageBlur(Image img, int dx, int dy) {
         PIXCMP += 4;
         int currentPixel = ImageGetPixel(img, x, y);
         int leftPixelSum = (x > 0) ? valuesum[G(img, x - 1, y)] : 0;
-        int abovePixelSum = (y > 0) ? valuesum[G(img, x, y - 1)] : 0;
+        int topPixelSum = (y > 0) ? valuesum[G(img, x, y - 1)] : 0;
         int diagonalPixelSum = (x > 0 && y > 0) ? valuesum[G(img, x - 1, y - 1)] : 0;
 
         if (x > 0 && y > 0) {
-            valuesum[G(img, x, y)] = currentPixel + leftPixelSum + abovePixelSum - diagonalPixelSum;
+            valuesum[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum - diagonalPixelSum;
         }
         else if (x > 0) {
-            valuesum[G(img, x, y)] = currentPixel + leftPixelSum + abovePixelSum;
+            valuesum[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum;
         }
         else if (y > 0) {
-            valuesum[G(img, x, y)] = currentPixel + abovePixelSum;
+            valuesum[G(img, x, y)] = currentPixel + topPixelSum;
         }
         else {
             valuesum[G(img, x, y)] = currentPixel;
@@ -666,7 +667,6 @@ void OldImageBlur(Image img, int dx, int dy) {
       }
     }
   }
-  
   else {
     free(valuesum); //destroi a imagem
   }
