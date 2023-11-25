@@ -387,8 +387,15 @@ int main(int argc, char* argv[]) {
     printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
     InstrPrint();  
     ImageDestroy(&subWorst);
+    int b=ImageOldMatchSubImage(worst, &worstX, &worstY, subWorst);
+    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
+    InstrPrint();  
+    ImageDestroy(&subWorst);
+    
   }
   ImageDestroy(&img512);
+
+
 
     return 0;
 }
