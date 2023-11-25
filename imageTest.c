@@ -416,7 +416,7 @@ int main(int argc, char* argv[]) {
   ImageDestroy(&imgNormal);
 
 
-
+  InstrReset(); // to reset instrumentation
   Image worst2 = ImageCreate(800,800,50);
   ImageThreshold(worst2, 0);
   Image subWorst2 = ImageCrop(worst, 0, 0, 400, 400);  
