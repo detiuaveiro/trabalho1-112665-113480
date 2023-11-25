@@ -397,11 +397,8 @@ int main(int argc, char* argv[]) {
   }
   ImageDestroy(&worst);
   Image imgNormal = ImageLoad(argv[2]);
-
   for (int width = 1; width < ImageWidth(imgNormal); width*=2) {
-    //criar uma janela para o melhor cenário
-    Image miniNormal = ImageCrop(imgNormal, 0, 0, width, width);  
-    InstrReset(); // to reset instrumentation
+    Image miniNormal = ImageCrop(imgNormal, 512-width, 512-width, width, width);  
     int normalX, normalY;
     int normalX2, normalY2;
     InstrReset();
