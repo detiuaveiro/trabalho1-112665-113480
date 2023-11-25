@@ -396,6 +396,8 @@ int main(int argc, char* argv[]) {
     
   }
   ImageDestroy(&worst);
+
+  InstrReset(); // to reset instrumentation
   Image imgNormal = ImageLoad(argv[2]);
   for (int width = 1; width < ImageWidth(imgNormal); width*=2) {
     Image miniNormal = ImageCrop(imgNormal, 512-width, 512-width, width, width);  
