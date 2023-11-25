@@ -600,6 +600,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
         for (int j = 0; j < img2->height; j++) {
             PIXCMP += 1;
             PIXMEM += 2;
+            ITERATIONS++;
             if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]) {
                 return 0;
             }

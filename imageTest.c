@@ -337,7 +337,7 @@ int main(int argc, char* argv[]) {
   InstrReset();
   Image img17 = ImageLoad(argv[2]);
   printf("\nHeight: %d, Width: %d\n", ImageHeight(img17), ImageWidth(img17));
-  ImageBlur(img17,500,400);
+  ImageBlur(img17,50,20);
   printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img17), ImageWidth(img17));
   InstrPrint();
   ImageDestroy(&img17);
@@ -389,6 +389,22 @@ int main(int argc, char* argv[]) {
     ImageDestroy(&subWorst);
   }
   ImageDestroy(&img512);
+
+
+
+  Image worst2 = ImageCreate(800,800,50);
+  ImageThreshold(worst2, 0);
+  Image subWorst2 = ImageCrop(worst, 0, 0, 400, 400);  
+  ImageSetMaxval(subWorst2, 100);
+  ImageSetPixel(subWorst2, 399, 399, 51);
+  ImageSetPixel(subWorst2, 399, 398, 49);
+  InstrReset(); // to reset instrumentation
+  int worstX2, worstY2;
+  int a2 =ImageLocateSubImage(worst2, &worstX2, &worstY2, subWorst2);
+  printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", 400, a2);
+  InstrPrint();
+  ImageDestroy(&subWorst2);
+  ImageDestroy(&worst2);
 
     return 0;
 }
