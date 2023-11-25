@@ -145,7 +145,9 @@ static int check(int condition, const char* failmsg) {
 void ImageInit(void) { ///
   InstrCalibrate();
   InstrName[0] = "pixmem";
-  InstrName[1] = "pixcmp";  // InstrCount[0] will count pixel array acesses
+  InstrName[1] = "pixcmp";
+  InstrName[2] = "iterations";
+    // InstrCount[0] will count pixel array acesses
   // Name other counters here...
   
 }
@@ -153,6 +155,7 @@ void ImageInit(void) { ///
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
 #define PIXCMP InstrCount[1]
+#define ITERATIONS InstrCount[2]
 // Add more macros here...
 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
@@ -666,6 +669,7 @@ void OldImageBlur(Image img, int dx, int dy) {
       for (int k = i - dx; k <= i + dx; k++) {
         for (int l = j - dy; l <= j + dy; l++) {
           PIXCMP++;
+          ITERATIONS++;
           if (ImageValidPos(img, k, l)) {
             sum += ImageGetPixel(img, k, l);
             count++;
@@ -678,6 +682,7 @@ void OldImageBlur(Image img, int dx, int dy) {
     for (int i = 0; i < img->width; i++) {
     for (int j = 0; j < img->height; j++) {
       ImageSetPixel(img, i, j, ImageGetPixel(blurredImage, i, j));
+      ITERATIONS++;
     }
   }
 
@@ -690,29 +695,19 @@ void ImageBlur(Image img, int dx, int dy){
   if(check(valuesum != NULL, "Failed memory allocation")){
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
-        PIXCMP += 4;
+        PIXMEM+=4;
         int currentPixel = ImageGetPixel(img, x, y);
         int leftPixelSum = (x > 0) ? valuesum[G(img, x - 1, y)] : 0;
         int topPixelSum = (y > 0) ? valuesum[G(img, x, y - 1)] : 0;
         int diagonalPixelSum = (x > 0 && y > 0) ? valuesum[G(img, x - 1, y - 1)] : 0;
 
-        if (x > 0 && y > 0) {
-            valuesum[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum - diagonalPixelSum;
-        }
-        else if (x > 0) {
-            valuesum[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum;
-        }
-        else if (y > 0) {
-            valuesum[G(img, x, y)] = currentPixel + topPixelSum;
-        }
-        else {
-            valuesum[G(img, x, y)] = currentPixel;
-        }   
+        PIXMEM+=1;
+        valuesum[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum - diagonalPixelSum;
+        ITERATIONS++;
       }
     }
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
-        PIXCMP += 8;
         xstart = (x - dx) > 0 ? (x - dx) : 0;
         ystart = (y - dy) > 0 ? (y - dy) : 0;
         xend = (x + dx) < img->width ? (x + dx) : (img->width - 1);
@@ -720,9 +715,11 @@ void ImageBlur(Image img, int dx, int dy){
         xSize = xend - xstart + 1;
         ySize = yend - ystart + 1;
         count = ySize * xSize;
+        PIXMEM+=4;
         blurval = valuesum[G(img, xend, yend)] - ((ystart > 0) ? valuesum[G(img, xend, ystart - 1)] : 0) - ((xstart > 0) ? valuesum[G(img, xstart - 1, yend)] : 0) + ((xstart > 0 && ystart > 0) ? valuesum[G(img, xstart - 1, ystart - 1)] : 0);
         blurval = (blurval + count / 2)/count;
         ImageSetPixel(img, x, y, blurval);
+        ITERATIONS++;
       }
     }
   }
