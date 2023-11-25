@@ -406,11 +406,10 @@ int main(int argc, char* argv[]) {
     printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
     InstrPrint();  
     InstrReset(); // to reset instrumentation
-    int b = ImageLocateOldSubImage(imgNormal, &normalX2, &normalY2, miniNormal);
+    int b = ImageLocateOldSubImage(imgNormal, &normalX, &normalY, miniNormal);
     printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, b);
     InstrPrint();  
     ImageDestroy(&miniNormal);
-
   }
   ImageDestroy(&imgNormal);
 
