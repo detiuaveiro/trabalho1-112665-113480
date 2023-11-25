@@ -668,7 +668,6 @@ void OldImageBlur(Image img, int dx, int dy) {
 
       for (int k = i - dx; k <= i + dx; k++) {
         for (int l = j - dy; l <= j + dy; l++) {
-          PIXCMP++;
           ITERATIONS++;
           if (ImageValidPos(img, k, l)) {
             sum += ImageGetPixel(img, k, l);

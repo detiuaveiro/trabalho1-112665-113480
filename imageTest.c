@@ -375,7 +375,7 @@ int main(int argc, char* argv[]) {
   Image worst = ImageCreate(512,512,50);
   ImageThreshold(worst, 0);
     //ciclo para criar varias janelas e testar a função
-  for (int width = 4; width < ImageWidth(worst); width*=2) {
+  for (int width = 2; width < ImageWidth(worst); width*=2) {
     //criar uma janela para o melhor cenário
     Image subWorst = ImageCrop(worst, 0, 0, width, width);  
     ImageSetMaxval(subWorst, 100);
