@@ -383,6 +383,8 @@ int main(int argc, char* argv[]) {
     ImageSetPixel(subWorst, width-1, width-2, 49);
     InstrReset(); // to reset instrumentation
   int worstX, worstY;
+  int worstX2, worstY2;
+    InstrReset();
     int a =ImageLocateSubImage(worst, &worstX, &worstY, subWorst);
     printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
     InstrPrint();
@@ -394,8 +396,29 @@ int main(int argc, char* argv[]) {
     
   }
   ImageDestroy(&worst);
-  /*
-  
+  Image imgNormal = ImageLoad(argv[2]);
+
+  for (int width = 1; width < ImageWidth(imgNormal); width*=2) {
+    //criar uma janela para o melhor cenário
+    Image miniNormal = ImageCrop(imgNormal, 0, 0, width, width);  
+    InstrReset(); // to reset instrumentation
+    int normalX, normalY;
+    int normalX2, normalY2;
+    InstrReset();
+    int a = ImageLocateSubImage(imgNormal, &normalX, &normalY, miniNormal);
+    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
+    InstrPrint();  
+    InstrReset(); // to reset instrumentation
+    int b = ImageLocateOldSubImage(imgNormal, &normalX2, &normalY2, miniNormal);
+    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, b);
+    InstrPrint();  
+    ImageDestroy(&miniNormal);
+
+  }
+  ImageDestroy(&imgNormal);
+
+
+
   Image worst2 = ImageCreate(800,800,50);
   ImageThreshold(worst2, 0);
   Image subWorst2 = ImageCrop(worst, 0, 0, 400, 400);  
