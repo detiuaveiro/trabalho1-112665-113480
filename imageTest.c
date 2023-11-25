@@ -272,27 +272,18 @@ int main(int argc, char* argv[]) {
   int px, py;
   printf("# Teste da função ImageLocateSubImage\n");
 
-  Image branca = ImageCreate(512, 512, 255);
+  Image img512 = ImageLoad(argv[2]);
     //ciclo para criar varias janelas e testar a função
-  for (int width = 1; width < ImageWidth(branca); width*=2) {
+  for (int width = 1; width < ImageWidth(img512); width*=2) {
     //criar uma janela para o melhor cenário
-    Image subBest = ImageCrop(branca, 0, 0, width, width);  
-    //criar uma janela para o pior cenário
-    Image subWorst = ImageCrop(branca, 0, 0, width, width);
-    ImageSetPixel(subWorst, ImageWidth(subWorst)-1, ImageHeight(subWorst)-1, 0);  
+    Image subBest = ImageCrop(img512, 512-width, 512-width, width, width);  
     InstrReset(); // to reset instrumentation
-    int a =ImageLocateSubImage(branca, &px, &py, subBest);
-    printf("\n# IMAGELOCATESUBIMAGE BEST CASE (size: %d) SUCCESS: %d \n", width, a);
+    int a =ImageLocateSubImage(img512, &px, &py, subBest);
+    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
     InstrPrint();  
-    InstrReset(); // to reset instrumentation
-    ImageLocateSubImage(branca, &px, &py, subWorst);
-    printf("\n# IMAGELOCATESUBIMAGE WORST CASE (size: %d) SUCCESS %d\n", width, a);
-    InstrPrint();  
-    printf("\n");
     ImageDestroy(&subBest);
-    ImageDestroy(&subWorst);
   }
-  ImageDestroy(&branca);
+  ImageDestroy(&img512);
 
 
   InstrReset();
@@ -371,7 +362,8 @@ int main(int argc, char* argv[]) {
   ImageLocateSubImage(img22, &x22, &y22, img33);
   InstrPrint();
   Image img23 = ImageCreate(512,512,50);
-  ImageThreshold(img22, 100);
+  ImageThreshold(img22, 0);
+  ImageSetMaxval(img23, 100);
   Image img34 = ImageCrop(img22, 0, 0, 256, 256);
   ImageSetPixel(img23, 511, 511, 51);
   ImageSetPixel(img23, 511, 510, 49);
@@ -379,5 +371,24 @@ int main(int argc, char* argv[]) {
   InstrReset();
   ImageLocateSubImage(img22, &x23, &y23, img34);
   InstrPrint();
+
+  Image worst = ImageCreate(512,512,50);
+  ImageThreshold(worst, 0);
+    //ciclo para criar varias janelas e testar a função
+  for (int width = 4; width < ImageWidth(worst); width*=2) {
+    //criar uma janela para o melhor cenário
+    Image subWorst = ImageCrop(worst, 0, 0, width, width);  
+    ImageSetMaxval(subWorst, 100);
+    ImageSetPixel(subWorst, width-1, width-1, 51);
+    ImageSetPixel(subWorst, width-1, width-2, 49);
+    InstrReset(); // to reset instrumentation
+  int worstX, worstY;
+    int a =ImageLocateSubImage(worst, &worstX, &worstY, subWorst);
+    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
+    InstrPrint();  
+    ImageDestroy(&subWorst);
+  }
+  ImageDestroy(&img512);
+
     return 0;
 }
