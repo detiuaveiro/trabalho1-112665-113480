@@ -387,10 +387,10 @@ int main(int argc, char* argv[]) {
     InstrReset();
     int a =ImageLocateSubImage(worst, &worstX, &worstY, subWorst);
     printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
-    InstrPrint();  
+    InstrPrint();
     InstrReset(); // to reset instrumentation
-    int b=ImageLocateOldSubImage(worst, &worstX2, &worstY2, subWorst);
-    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, b);
+    int b=ImageLocateOldSubImage(worst, &worstX, &worstY, subWorst);
+    printf("\n# IMAGELOCATEOLDSUBIMAGE (size: %d) SUCCESS: %d \n", width, b);
     InstrPrint();  
     ImageDestroy(&subWorst);
     
@@ -429,6 +429,5 @@ int main(int argc, char* argv[]) {
   InstrPrint();
   ImageDestroy(&subWorst2);
   ImageDestroy(&worst2);
-
     return 0;
 }
