@@ -360,6 +360,24 @@ int main(int argc, char* argv[]) {
   ImageDestroy(&img21);
   //funciona se forem valores de dx e dy baixo tipo 50,20 se for 500 200 fica bue tempo e nao corre
 
-  return 0;
-
+  Image img22 = ImageCreate(512,512,50);
+  ImageThreshold(img22, 0);
+  Image img33 = ImageCrop(img22, 0, 0, 170, 170);
+  ImageSetMaxval(img33, 100);
+  ImageSetPixel(img33, 169, 169, 51);
+  ImageSetPixel(img33, 169, 168, 49);
+  int x22, y22;
+  InstrReset();
+  ImageLocateSubImage(img22, &x22, &y22, img33);
+  InstrPrint();
+  Image img23 = ImageCreate(512,512,50);
+  ImageThreshold(img22, 100);
+  Image img34 = ImageCrop(img22, 0, 0, 256, 256);
+  ImageSetPixel(img23, 511, 511, 51);
+  ImageSetPixel(img23, 511, 510, 49);
+  int x23, y23;
+  InstrReset();
+  ImageLocateSubImage(img22, &x23, &y23, img34);
+  InstrPrint();
+    return 0;
 }

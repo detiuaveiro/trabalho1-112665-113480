@@ -365,6 +365,11 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
   img->pixel[G(img, x, y)] = level;
 } 
 
+void ImageSetMaxval(Image img, uint8 maxval) { ///
+  assert (img != NULL);
+  assert (maxval > 0);
+  img->maxval = maxval;
+}
 
 /// Pixel transformations
 
@@ -609,7 +614,6 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) {
     for (int i = 0; i <= img1->width - img2->width; i++) {
         for (int j = 0; j <= img1->height - img2->height; j++) {
             hash_window = calculateHashWindow(img1, i, j, img2->width, img2->height);
-            PIXCMP += 1;
             if (hash_img2 == hash_window) {
                 if (ImageMatchSubImage(img1, i, j, img2)) {
                     *px = i;
