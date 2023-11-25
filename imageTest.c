@@ -385,18 +385,17 @@ int main(int argc, char* argv[]) {
   int worstX, worstY;
     int a =ImageLocateSubImage(worst, &worstX, &worstY, subWorst);
     printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
-    InstrPrint();  
-    ImageDestroy(&subWorst);
-    int b=ImageOldMatchSubImage(worst, &worstX, &worstY, subWorst);
-    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
+    InstrPrint();
+    InstrReset(); // to reset instrumentation
+    int b=ImageLocateOldSubImage(worst, &worstX, &worstY, subWorst);
+    printf("\n# IMAGELOCATEOLDSUBIMAGE (size: %d) SUCCESS: %d \n", width, b);
     InstrPrint();  
     ImageDestroy(&subWorst);
     
   }
-  ImageDestroy(&img512);
-
-
-
+  ImageDestroy(&worst);
+  /*
+  
   Image worst2 = ImageCreate(800,800,50);
   ImageThreshold(worst2, 0);
   Image subWorst2 = ImageCrop(worst, 0, 0, 400, 400);  
@@ -410,6 +409,6 @@ int main(int argc, char* argv[]) {
   InstrPrint();
   ImageDestroy(&subWorst2);
   ImageDestroy(&worst2);
-
+  */
     return 0;
 }
