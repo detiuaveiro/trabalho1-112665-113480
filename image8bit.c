@@ -587,7 +587,7 @@ int ImageLocateOldSubImage(Image img1, int* px, int* py, Image img2) {
 
     for (int i = 0; i <= img1->width - img2->width; i++) {
         for (int j = 0; j <= img1->height - img2->height; j++) {
-            if (ImageMatchSubImage(img1, i, j, img2)) {
+            if (ImageOldMatchSubImage(img1, i, j, img2)) {
                 *px = i;
                 *py = j;
                 return 1;

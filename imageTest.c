@@ -383,17 +383,19 @@ int main(int argc, char* argv[]) {
     ImageSetPixel(subWorst, width-1, width-2, 49);
     InstrReset(); // to reset instrumentation
   int worstX, worstY;
+  int worstX2, worstY2;
+    InstrReset();
     int a =ImageLocateSubImage(worst, &worstX, &worstY, subWorst);
     printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
     InstrPrint();  
-    ImageDestroy(&subWorst);
-    int b=ImageOldMatchSubImage(worst, &worstX, &worstY, subWorst);
-    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
+    InstrReset(); // to reset instrumentation
+    int b=ImageLocateOldSubImage(worst, &worstX2, &worstY2, subWorst);
+    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, b);
     InstrPrint();  
     ImageDestroy(&subWorst);
     
   }
-  ImageDestroy(&img512);
+  ImageDestroy(&worst);
 
 
 
