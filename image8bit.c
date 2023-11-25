@@ -569,6 +569,7 @@ int ImageOldMatchSubImage(Image img1, int x, int y, Image img2){
     for (int j = 0; j < img2->height; j++){
       PIXCMP += 1;
       PIXMEM += 2;
+      ITERATIONS++;
       if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]){
         return 0;
       }
@@ -600,6 +601,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
         for (int j = 0; j < img2->height; j++) {
             PIXCMP += 1;
             PIXMEM += 2;
+            ITERATIONS++;
             if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]) {
                 return 0;
             }
@@ -633,6 +635,7 @@ int calculateHash(Image img) {
     for (int i = 0; i < img->width; i++) {
         for (int j = 0; j < img->height; j++) {
             PIXMEM += 1;
+            ITERATIONS++;
             hash += img->pixel[G(img, i, j)];
         }
     }
@@ -644,6 +647,7 @@ int calculateHashWindow(Image img, int x, int y, int width, int height) {
     for (int i = x; i < x + width; i++) {
         for (int j = y; j < y + height; j++) {
             PIXMEM += 1;
+            ITERATIONS++;
             hash += img->pixel[G(img, i, j)];
         }
     }
