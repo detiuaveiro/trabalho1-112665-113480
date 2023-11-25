@@ -590,7 +590,6 @@ int ImageLocateOldSubImage(Image img1, int* px, int* py, Image img2) {
             if (ImageMatchSubImage(img1, i, j, img2)) {
                 *px = i;
                 *py = j;
-                ITERATIONS++;
                 return 1;
             }
         }
