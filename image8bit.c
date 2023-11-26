@@ -635,20 +635,20 @@ void OldImageBlur(Image img, int dx, int dy) {
   ImageDestroy(&blurredImage); //destrói a imagem
 }
 void ImageBlur(Image img, int dx, int dy){
-  int* valuesum;
-  int blurval, xstart, xend, ystart, yend, xSize, ySize, count;
-  valuesum = (uint8*) malloc(sizeof(uint8*) * img->height * img->width);
-  if(check(valuesum != NULL, "Failed memory allocation")){
+  int* sumPixels; //array onde iremos armazenar a soma de pixeis
+  int blurval, xstart, xend, ystart, yend, xSize, ySize, count; 
+  sumPixels = (uint8*) malloc(sizeof(uint8*) * img->height * img->width); //alocamos memória para o array
+  if(check(sumPixels != NULL, "Failed memory allocation")){ //verificamos se a alocação foi bem sucedida
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
         PIXMEM+=4;
         int currentPixel = ImageGetPixel(img, x, y);
-        int leftPixelSum = (x > 0) ? valuesum[G(img, x - 1, y)] : 0;
-        int topPixelSum = (y > 0) ? valuesum[G(img, x, y - 1)] : 0;
-        int diagonalPixelSum = (x > 0 && y > 0) ? valuesum[G(img, x - 1, y - 1)] : 0;
+        int leftPixelSum = (x > 0) ? sumPixels[G(img, x - 1, y)] : 0;
+        int topPixelSum = (y > 0) ? sumPixels[G(img, x, y - 1)] : 0;
+        int diagonalPixelSum = (x > 0 && y > 0) ? sumPixels[G(img, x - 1, y - 1)] : 0;
 
         PIXMEM+=1;
-        valuesum[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum - diagonalPixelSum;
+        sumPixels[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum - diagonalPixelSum;
         ITERATIONS++;
       }
     }
@@ -662,12 +662,12 @@ void ImageBlur(Image img, int dx, int dy){
         ySize = yend - ystart + 1;
         count = ySize * xSize;
         PIXMEM+=4;
-        blurval = valuesum[G(img, xend, yend)] - ((ystart > 0) ? valuesum[G(img, xend, ystart - 1)] : 0) - ((xstart > 0) ? valuesum[G(img, xstart - 1, yend)] : 0) + ((xstart > 0 && ystart > 0) ? valuesum[G(img, xstart - 1, ystart - 1)] : 0);
+        blurval = sumPixels[G(img, xend, yend)] - ((ystart > 0) ? sumPixels[G(img, xend, ystart - 1)] : 0) - ((xstart > 0) ? sumPixels[G(img, xstart - 1, yend)] : 0) + ((xstart > 0 && ystart > 0) ? sumPixels[G(img, xstart - 1, ystart - 1)] : 0);
         blurval = (blurval + count / 2)/count;
         ImageSetPixel(img, x, y, blurval);
         ITERATIONS++;
       }
     }
   }
-  free(valuesum); //destroi a imagem
+  free(sumPixels); //destroi a imagem
 }
