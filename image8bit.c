@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "instrumentation.h"
-#include <string.h>
 // The data structure
 //
 // An image is stored in a structure containing 3 fields:
@@ -555,10 +554,14 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
         }
     }
 }
+
+int* buildKMPTable(Image img);
+
+
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
-int ImageMatchSubImage(Image img1, int x, int y, Image img2){
+int ImageOldMatchSubImage(Image img1, int x, int y, Image img2){
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
@@ -566,7 +569,6 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2){
     for (int j = 0; j < img2->height; j++){
       PIXCMP += 1;
       PIXMEM += 2;
-      ITERATIONS++;
       if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]){
         return 0;
       }
@@ -578,7 +580,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2){
 /// Searches for img2 inside img1.
 /// If a match is found, returns 1 and matching position is set in vars (*px, *py).
 /// If no match is found, returns 0 and (*px, *py) are left untouched.
-int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) {
+int ImageLocateOldSubImage(Image img1, int* px, int* py, Image img2) {
     assert(img1 != NULL);
     assert(img2 != NULL);
 
@@ -593,7 +595,60 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) {
     }
     return 0;
 }
+int ImageMatchSubImage(Image img1, int x, int y, Image img2) {
+    for (int i = 0; i < img2->width; i++) {
+        for (int j = 0; j < img2->height; j++) {
+            PIXCMP += 1;
+            PIXMEM += 2;
+            if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) {
+    assert(img1 != NULL);
+    assert(img2 != NULL);
 
+    int hash_img2 = calculateHash(img2);
+    int hash_window;
+
+    for (int i = 0; i <= img1->width - img2->width; i++) {
+        for (int j = 0; j <= img1->height - img2->height; j++) {
+            hash_window = calculateHashWindow(img1, i, j, img2->width, img2->height);
+            if (hash_img2 == hash_window) {
+                if (ImageMatchSubImage(img1, i, j, img2)) {
+                    *px = i;
+                    *py = j;
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+int calculateHash(Image img) {
+    int hash = 0;
+    for (int i = 0; i < img->width; i++) {
+        for (int j = 0; j < img->height; j++) {
+            PIXMEM += 1;
+            hash += img->pixel[G(img, i, j)];
+        }
+    }
+    return hash;
+}
+
+int calculateHashWindow(Image img, int x, int y, int width, int height) {
+    int hash = 0;
+    for (int i = x; i < x + width; i++) {
+        for (int j = y; j < y + height; j++) {
+            PIXMEM += 1;
+            hash += img->pixel[G(img, i, j)];
+        }
+    }
+    return hash;
+}
 ///filtering
 /// Blur an image by a applying a (2dx+1)x(2dy+1) mean filter.
 /// Each pixel is substituted by the mean of the pixels in the rectangle
@@ -606,8 +661,8 @@ void OldImageBlur(Image img, int dx, int dy) {
   // Create a temporary image to store the blurred result
   Image blurredImage = ImageCreate(img->width+1, img->height+1, img->maxval);
   ImagePaste(blurredImage,0, 0, img);
-  for (int i = 0; i < img->width; i++) {
-    for (int j = 0; j < img->height; j++) {
+  for (int i = 0; i <= img->width; i++) {
+    for (int j = 0; j <= img->height; j++) {
       int sum = 0;
       int count = 0;
 
@@ -633,20 +688,20 @@ void OldImageBlur(Image img, int dx, int dy) {
   ImageDestroy(&blurredImage); //destrói a imagem
 }
 void ImageBlur(Image img, int dx, int dy){
-  int* media;
+  int* valuesum;
   int blurval, xstart, xend, ystart, yend, xSize, ySize, count;
-  media = (uint8*) malloc(sizeof(uint8*) * img->height * img->width);
-  if(check(media != NULL, "Failed memory allocation")){
+  valuesum = (uint8*) malloc(sizeof(uint8*) * img->height * img->width);
+  if(check(valuesum != NULL, "Failed memory allocation")){
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
         PIXMEM+=4;
         int currentPixel = ImageGetPixel(img, x, y);
-        int leftPixel = (x > 0) ? media[G(img, x - 1, y)] : 0;
-        int topPixel = (y > 0) ? media[G(img, x, y - 1)] : 0;
-        int diagonalPixel = (x > 0 && y > 0) ? media[G(img, x - 1, y - 1)] : 0;
+        int leftPixelSum = (x > 0) ? valuesum[G(img, x - 1, y)] : 0;
+        int topPixelSum = (y > 0) ? valuesum[G(img, x, y - 1)] : 0;
+        int diagonalPixelSum = (x > 0 && y > 0) ? valuesum[G(img, x - 1, y - 1)] : 0;
 
         PIXMEM+=1;
-        media[G(img, x, y)] = currentPixel + leftPixel + topPixel - diagonalPixel;
+        valuesum[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum - diagonalPixelSum;
         ITERATIONS++;
       }
     }
@@ -660,12 +715,12 @@ void ImageBlur(Image img, int dx, int dy){
         ySize = yend - ystart + 1;
         count = ySize * xSize;
         PIXMEM+=4;
-        blurval = media[G(img, xend, yend)] - ((ystart > 0) ? media[G(img, xend, ystart - 1)] : 0) - ((xstart > 0) ? media[G(img, xstart - 1, yend)] : 0) + ((xstart > 0 && ystart > 0) ? media[G(img, xstart - 1, ystart - 1)] : 0);
+        blurval = valuesum[G(img, xend, yend)] - ((ystart > 0) ? valuesum[G(img, xend, ystart - 1)] : 0) - ((xstart > 0) ? valuesum[G(img, xstart - 1, yend)] : 0) + ((xstart > 0 && ystart > 0) ? valuesum[G(img, xstart - 1, ystart - 1)] : 0);
         blurval = (blurval + count / 2)/count;
         ImageSetPixel(img, x, y, blurval);
         ITERATIONS++;
       }
     }
   }
-  free(media); //destroi a imagem
+  free(valuesum); //destroi a imagem
 }
