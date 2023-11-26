@@ -561,6 +561,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2){
     for (int j = 0; j < img2->height; j++){ 
       PIXCMP += 1; // Incrementa o contador de comparações
       PIXMEM += 2; // Incrementa o contador de acessos à memória 2 vezes (1 para cada variável)
+      ITERATIONS++; // Incrementa o contador de iterações
       if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]){
         return 0; // Se os pixeis não forem iguais, retorna 0
       }
