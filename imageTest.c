@@ -269,22 +269,6 @@ int main(int argc, char* argv[]) {
   // Free memory
   ImageDestroy(&img13);
   ImageDestroy(&cp13);
-  int px, py;
-  printf("# Teste da função ImageLocateSubImage\n");
-
-  Image img512 = ImageLoad(argv[2]);
-    //ciclo para criar varias janelas e testar a função
-  for (int width = 1; width < ImageWidth(img512); width*=2) {
-    //criar uma janela para o melhor cenário
-    Image subBest = ImageCrop(img512, 512-width, 512-width, width, width);  
-    InstrReset(); // to reset instrumentation
-    int a =ImageLocateSubImage(img512, &px, &py, subBest);
-    printf("\n# IMAGELOCATESUBIMAGE (size: %d) SUCCESS: %d \n", width, a);
-    InstrPrint();  
-    ImageDestroy(&subBest);
-  }
-  ImageDestroy(&img512);
-
 
   InstrReset();
   Image img14 = ImageLoad(argv[1]);
@@ -376,7 +360,7 @@ int main(int argc, char* argv[]) {
     Image branca2 = ImageLoad(argv[2]);
     Image branca = ImageCrop(branca2, 0, 0, ImageWidth(branca2), ImageHeight(branca2));
     ImageThreshold(branca, 0);
-
+    int px, py;
     //ciclo para criar varias janelas e testar a função
     for (int width = 1; width < ImageWidth(branca); width*=2) {
       //criar uma janela para o melhor cenário

@@ -176,21 +176,18 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
   Image img = (Image)malloc(sizeof(struct image)); //alocamos memória para a imagem
-  if (img == NULL) {
-    errCause = "Out of memory";
-    return NULL;
-  }
+  if (check(img != NULL, "Failed to create the new image.")){ //verificamos se a alocação foi bem sucedida
   img->width = width;
   img->height = height;
   img->maxval = maxval;
   img->pixel = (uint8*)malloc(width*height*sizeof(uint8));
-  if (img->pixel == NULL) {
-    errCause = "Out of memory";
-    free(img);
-    return NULL;
-  }
   PIXMEM += (unsigned long)(width*height);  // atribui o número de acessos à memória 
   return img;
+  }
+  else {
+    ImageDestroy(&img); //destroi a imagem
+    return NULL;
+  }
 }
 
 /// Destroy the image pointed to by (*imgp).
@@ -438,18 +435,17 @@ Image ImageRotate(Image img) {
   assert(img != NULL);
   uint8 maxval = img->maxval;
   Image newImg = ImageCreate(img->height, img->width, maxval);
-  
-  if (newImg == NULL) {
-    // Handle memory allocation failure
-    return NULL;
-  }
   for (int i = 0; i < img->height; i++) {
     for (int j = 0; j < img->width; j++) {
       uint8 newPixel = img->pixel[i*img->width + j]; // Define o valor do newPixel como sendo o pixel da imagem img na posição (i, j)
       newImg->pixel[(img->width - j - 1) * img->height + i] = newPixel; //copia os pixeis da imagem img para a imagem newImg, fazedo a rotação de 90º
     }
   }
-  return newImg;
+  if (check(newImg != NULL, "Failed to create the new image.")) return newImg; //verificamos se a alocação foi bem sucedida
+  else {
+    ImageDestroy(&newImg); //destroi a imagem
+    return NULL;
+  }
 }
 
 /// Mirror an image = flip left-right.
@@ -467,7 +463,11 @@ Image ImageMirror(Image img) {
       NewImg->pixel[G(img, i, j)] = img->pixel[G(img, img->width - i - 1, j)]; //copia os pixeis da imagem img para a imagem NewImg
     }
   }
-  return NewImg;
+  if (check(NewImg != NULL, "Failed to create the new image.")) return NewImg; //verificamos se a alocação foi bem sucedida
+  else {
+    ImageDestroy(&NewImg); //destroi a imagem
+    return NULL;
+  }
 }
 
 /// Crop a rectangular subimage from img.
@@ -488,7 +488,6 @@ Image ImageCrop(Image img, int x, int y, int w, int h) {
 
     Image newImg = ImageCreate(w, h, img->maxval);
     if (newImg == NULL) {
-        // Handle memory allocation failure
         return NULL;
     }
 
