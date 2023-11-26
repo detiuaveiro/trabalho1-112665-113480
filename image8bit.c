@@ -515,8 +515,8 @@ Image ImageCrop(Image img, int x, int y, int w, int h) {
 /// This modifies img1 in-place: no allocation involved.
 /// Requires: img2 must fit inside img1 at position (x, y).
 void ImagePaste(Image img1, int x, int y, Image img2) { ///
-  assert (img1 != NULL);
-  assert (img2 != NULL);
+  assert (img1 != NULL); 
+  assert (img2 != NULL); 
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
   for (int i = 0; i < img2->width; i++) {
@@ -545,7 +545,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
 
             uint8_t finalPixel = (blendedPixel > img1->maxval) ? img1->maxval : (blendedPixel < 0) ? 0 : (uint8_t)(blendedPixel + 0.5); // Verifica se o valor do pixel está dentro dos limites e arredonda o valor para o inteiro mais próximo.
 
-            img1->pixel[(y + i) * img1->width + (x + j)] = finalPixel; // Define o valor do pixel na posição (x + j, y + i) da imagem img1 como sendo o finalPixel
+            img1->pixel[G(img1,x+j,y+i)] = finalPixel; // Define o valor do pixel na posição (x + j, y + i) da imagem img1 como sendo o finalPixel
         }
     }
 }
