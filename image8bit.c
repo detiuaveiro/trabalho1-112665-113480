@@ -154,8 +154,8 @@ void ImageInit(void) { ///
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
-#define PIXCMP InstrCount[1]
-#define ITERATIONS InstrCount[2]
+#define PIXCMP InstrCount[1] //contar o número de comparações
+#define ITERATIONS InstrCount[2] //contar o número de iterações
 // Add more macros here...
 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
@@ -175,7 +175,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (width >= 0);
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
-  Image img = (Image)malloc(sizeof(struct image));
+  Image img = (Image)malloc(sizeof(struct image)); //alocamos memória para a imagem
   if (img == NULL) {
     errCause = "Out of memory";
     return NULL;
@@ -189,7 +189,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
     free(img);
     return NULL;
   }
-  PIXMEM += (unsigned long)(width*height);  // count pixel memory accesses %PERCEBER MAIS TARDE!!!!!!!!!!!!!!!
+  PIXMEM += (unsigned long)(width*height);  // atribui o número de acessos à memória 
   return img;
 }
 
@@ -316,7 +316,7 @@ int ImageMaxval(Image img) { ///
 /// *max is set to the maximum.
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
-  *min = PixMax;
+  *min = PixMax; 
   *max = 0;
   for (int i = 0; i < img->width * img->height; i++){
   if (img->pixel[i] < *min) *min = img->pixel[i];
