@@ -317,10 +317,10 @@ int ImageMaxval(Image img) { ///
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
   *min = PixMax; 
-  *max = 0;
+  *max = 0; // Define o valor do min como sendo o valor máximo do pixel e o valor do max como sendo o valor mínimo do pixel
   for (int i = 0; i < img->width * img->height; i++){
-  if (img->pixel[i] < *min) *min = img->pixel[i];
-  if (img->pixel[i] > *max) *max = img->pixel[i];
+  if (img->pixel[i] < *min) *min = img->pixel[i]; 
+  if (img->pixel[i] > *max) *max = img->pixel[i]; // Define o valor do min como sendo o valor mínimo do pixel e o valor do max como sendo o valor máximo do pixel
 }
 
 }
@@ -348,16 +348,16 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
   int index = y * img->width + x;
-  assert (0 <= index && index < img->width*img->height);
+  assert (0 <= index && index < img->width*img->height); // Verifica se o index está dentro dos limites
   return index;
 }
 
 /// Get the pixel (level) at position (x,y).
 uint8 ImageGetPixel(Image img, int x, int y) { ///
   assert (img != NULL);
-  assert (ImageValidPos(img, x, y));
-  PIXMEM++;
-  return img->pixel[G(img, x, y)];
+  assert (ImageValidPos(img, x, y)); // Verifica se a posição (x, y) é válida na imagem img
+  PIXMEM++; // Incrementa o contador de acessos à memória
+  return img->pixel[G(img, x, y)]; // Retorna o valor do pixel na posição (x, y)
 } 
 
 /// Set the pixel at position (x,y) to new level.
@@ -365,13 +365,13 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
   assert (img != NULL);
   assert (ImageValidPos(img, x, y));
   PIXMEM++;
-  img->pixel[G(img, x, y)] = level;
+  img->pixel[G(img, x, y)] = level; // Define o valor do pixel na posição (x, y) como sendo level
 } 
 
 void ImageSetMaxval(Image img, uint8 maxval) { ///
   assert (img != NULL);
   assert (maxval > 0);
-  img->maxval = maxval;
+  img->maxval = maxval; // Define o valor máximo do pixel como sendo maxval
 }
 
 /// Pixel transformations
@@ -388,7 +388,7 @@ void ImageSetMaxval(Image img, uint8 maxval) { ///
 void ImageNegative(Image img) { ///
   assert (img != NULL);
   for (int i = 0; i < img->width * img->height; i++){
-    img->pixel[i] = PixMax - img->pixel[i];
+    img->pixel[i] = PixMax - img->pixel[i]; // Define o valor do pixel na posição i como sendo o valor máximo menos o valor do pixel na posição i
   }
 }
 
@@ -399,7 +399,7 @@ void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   for (int i = 0; i < img->width * img->height; i++){
     if (img->pixel[i] < thr) img->pixel[i] = 0;
-    else img->pixel[i] = img->maxval;
+    else img->pixel[i] = img->maxval; // Define o valor do pixel na posição i como sendo o valor máximo se o valor do pixel na posição i for maior ou igual a thr, caso contrário, define o valor do pixel na posição i como sendo 0
   }
 }
 
@@ -412,9 +412,9 @@ void ImageBrighten(Image img, double factor) { ///
   assert( factor > 0.0);
   for (int x = 0; x < img->width; x++) {
     for (int y = 0; y < img->height; y++) {
-      int index = G(img, x, y);
-      img->pixel[index] = (uint8)(img->pixel[index] * factor + 0.5);
-      if (img->pixel[index] > img->maxval) img->pixel[index] = img->maxval;
+      int index = G(img, x, y); // Define o valor do index como sendo o valor do pixel na posição (x, y)
+      img->pixel[index] = (uint8)(img->pixel[index] * factor + 0.5); // Multiplica o valor do pixel por factor e arredonda o valor para o inteiro mais próximo
+      if (img->pixel[index] > img->maxval) img->pixel[index] = img->maxval; // Verifica se o valor do pixel está dentro dos limites
     }
   }
 }
@@ -450,8 +450,8 @@ Image ImageRotate(Image img) {
   }
   for (int i = 0; i < img->height; i++) {
     for (int j = 0; j < img->width; j++) {
-      uint8 newPixel = img->pixel[i*img->width + j];
-      newImg->pixel[(img->width - j - 1) * img->height + i] = newPixel;
+      uint8 newPixel = img->pixel[i*img->width + j]; // Define o valor do newPixel como sendo o pixel da imagem img na posição (i, j)
+      newImg->pixel[(img->width - j - 1) * img->height + i] = newPixel; //copia os pixeis da imagem img para a imagem newImg, fazedo a rotação de 90º
     }
   }
   return newImg;
@@ -469,7 +469,7 @@ Image ImageMirror(Image img) {
   Image NewImg = ImageCreate(img->width, img->height, img->maxval);
   for (int i = 0; i < img->width; i++){
     for (int j = 0; j < img->height; j++){
-      NewImg->pixel[G(img, i, j)] = img->pixel[G(img, img->width - i - 1, j)];
+      NewImg->pixel[G(img, i, j)] = img->pixel[G(img, img->width - i - 1, j)]; //copia os pixeis da imagem img para a imagem NewImg
     }
   }
   return NewImg;
@@ -499,8 +499,8 @@ Image ImageCrop(Image img, int x, int y, int w, int h) {
 
     for (int i = 0; i < w; i++) {
         for (int j = 0; j < h; j++) {
-            uint8 pixelValue = ImageGetPixel(img, x + i, y + j);
-            ImageSetPixel(newImg, i, j, pixelValue);
+            uint8 pixelValue = ImageGetPixel(img, x + i, y + j);  // Define o valor do pixelValue como sendo o pixel da imagem img na posição (x + i, y + j)
+            ImageSetPixel(newImg, i, j, pixelValue); //copia os pixeis da imagem img para a imagem newImg
         }
     }
 
@@ -517,11 +517,11 @@ Image ImageCrop(Image img, int x, int y, int w, int h) {
 void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
-  assert (ImageValidRect(img1, x, y, img2->width, img2->height));
+  assert (ImageValidRect(img1, x, y, img2->width, img2->height)); // Verifica se a imagem img2 cabe na imagem img1 na posição (x, y)
   // Insert your code here!
   for (int i = 0; i < img2->width; i++) {
     for (int j = 0; j < img2->height; j++) {
-      img1->pixel[G(img1, x + i, y + j)] = img2->pixel[G(img2, i, j)];
+      img1->pixel[G(img1, x + i, y + j)] = img2->pixel[G(img2, i, j)]; //copia os pixeis da imagem img2 para a imagem img1
     }
   }
 }
