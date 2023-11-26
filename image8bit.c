@@ -532,63 +532,55 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
 /// alpha usually is in [0.0, 1.0], but values outside that interval
 /// may provide interesting effects.  Over/underflows should saturate.
 void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
-    assert(img1 != NULL);
-    assert(img2 != NULL);
-    assert(ImageValidRect(img1, x, y, img2->width, img2->height));
+    assert(img1 != NULL); // Verifica se a imagem img1 existe
+    assert(img2 != NULL); // Verifica se a imagem img2 existe
+    assert(ImageValidRect(img1, x, y, img2->width, img2->height)); // Verifica se a imagem img2 cabe na imagem img1 na posição (x, y)
 
-    for (int i = 0; i < img2->height; i++) {
-        for (int j = 0; j < img2->width; j++) {
-            // Get the pixel values from both images
-            uint8_t pixel1 = img1->pixel[(y + i) * img1->width + (x + j)];
-            uint8_t pixel2 = img2->pixel[i * img2->width + j];
+    for (int i = 0; i < img2->height; i++) { // Percorre os pixeis da imagem img2
+        for (int j = 0; j < img2->width; j++) { 
+            uint8_t pixel1 = img1->pixel[G(img1, x + j, y + i)]; // Define o valor do pixel1 como sendo o pixel da imagem img1 na posição (x + j, y + i)
+            uint8_t pixel2 = img2->pixel[G(img2, j, i)]; // Define o valor do pixel2 como sendo o pixel da imagem img2 na posição (j, i)
 
-            // Calculate the new pixel value after blending
-            double blendedPixel = (1.0 - alpha) * pixel1 + alpha * pixel2;
+            double blendedPixel = (1.0 - alpha) * pixel1 + alpha * pixel2;  // Calcula o valor do pixel resultante da mistura dos pixeis das imagens img1 e img2 tendo em conta o valor de alpha
 
-            // Round and saturate the resulting value to the range [0, maxval]
-            uint8_t finalPixel = (blendedPixel > img1->maxval) ? img1->maxval : 
-                                 (blendedPixel < 0) ? 0 : (uint8_t)(blendedPixel + 0.5);
+            uint8_t finalPixel = (blendedPixel > img1->maxval) ? img1->maxval : (blendedPixel < 0) ? 0 : (uint8_t)(blendedPixel + 0.5); // Verifica se o valor do pixel está dentro dos limites e arredonda o valor para o inteiro mais próximo.
 
-            // Update the pixel in the larger image (img1)
-            img1->pixel[(y + i) * img1->width + (x + j)] = finalPixel;
+            img1->pixel[(y + i) * img1->width + (x + j)] = finalPixel; // Define o valor do pixel na posição (x + j, y + i) da imagem img1 como sendo o finalPixel
         }
     }
 }
-
-int* buildKMPTable(Image img);
-
 
 /// Compare an image to a subimage of a larger image.
 /// Returns 1 (true) if img2 matches subimage of img1 at pos (x, y).
 /// Returns 0, otherwise.
 int ImageMatchSubImage(Image img1, int x, int y, Image img2){
-  assert (img1 != NULL);
-  assert (img2 != NULL);
-  assert (ImageValidPos(img1, x, y));
-  for (int i = 0; i < img2-> width; i++){
-    for (int j = 0; j < img2->height; j++){
-      PIXCMP += 1;
-      PIXMEM += 2;
+  assert (img1 != NULL); // Verifica se a imagem img1 existe
+  assert (img2 != NULL); // Verifica se a imagem img2 existe
+  assert (ImageValidPos(img1, x, y)); // Verifica se a posição (x, y) é válida na imagem img1
+  for (int i = 0; i < img2-> width; i++){ // Percorre os pixeis da imagem img2
+    for (int j = 0; j < img2->height; j++){ 
+      PIXCMP += 1; // Incrementa o contador de comparações
+      PIXMEM += 2; // Incrementa o contador de acessos à memória 2 vezes (1 para cada variável)
       if (img1->pixel[G(img1, i+x, j+y)] != img2->pixel[G(img2, i, j)]){
-        return 0;
+        return 0; // Se os pixeis não forem iguais, retorna 0
       }
     }
   }
-  return 1;
+  return 1; // Se os pixeis forem todos iguais, retorna 1
 }
 /// Locate a subimage inside another image.
 /// Searches for img2 inside img1.
 /// If a match is found, returns 1 and matching position is set in vars (*px, *py).
 /// If no match is found, returns 0 and (*px, *py) are left untouched.
 int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) {
-    assert(img1 != NULL);
-    assert(img2 != NULL);
+    assert(img1 != NULL); // Verifica se a imagem img1 existe
+    assert(img2 != NULL); // Verifica se a imagem img2 existe
 
-    for (int i = 0; i <= img1->width - img2->width; i++) {
-        for (int j = 0; j <= img1->height - img2->height; j++) {
-            if (ImageMatchSubImage(img1, i, j, img2)) {
-                *px = i;
-                *py = j;
+    for (int i = 0; i <= img1->width - img2->width; i++) { // percorre os pixeis da imagem img1 até aos pixeis em que a imagem img2 cabe na imagem img1
+        for (int j = 0; j <= img1->height - img2->height; j++) {  
+            if (ImageMatchSubImage(img1, i, j, img2)) { // Verifica se a imagem img2 é igual a uma subimagem de img1
+                *px = i; // Se for igual, atualiza as variáveis px e py com as coordenadas da subimagem
+                *py = j; 
                 return 1;
             }
         }
@@ -631,41 +623,52 @@ void OldImageBlur(Image img, int dx, int dy) {
       ITERATIONS++;
     }
   }
-
   ImageDestroy(&blurredImage); //destrói a imagem
 }
+
+///filtering
+/// Blur an image by a applying a (2dx+1)x(2dy+1) mean filter.
+/// Each pixel is substituted by the mean of the pixels in the rectangle
+/// [x-dx, x+dx]x[y-dy, y+dy].
+/// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy){
   int* sumPixels; //array onde iremos armazenar a soma de pixeis
-  int blurval, xstart, xend, ystart, yend, xSize, ySize, count; 
+  int blurValue, xstart, xend, ystart, yend, xSize, ySize, count; 
   sumPixels = (uint8*) malloc(sizeof(uint8*) * img->height * img->width); //alocamos memória para o array
   if(check(sumPixels != NULL, "Failed memory allocation")){ //verificamos se a alocação foi bem sucedida
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
-        PIXMEM+=4;
+        PIXMEM+=4; //incrementamos o contador de acessos à memória 4 vezes (1 para cada variável)
         int currentPixel = ImageGetPixel(img, x, y);
         int leftPixelSum = (x > 0) ? sumPixels[G(img, x - 1, y)] : 0;
         int topPixelSum = (y > 0) ? sumPixels[G(img, x, y - 1)] : 0;
         int diagonalPixelSum = (x > 0 && y > 0) ? sumPixels[G(img, x - 1, y - 1)] : 0;
 
-        PIXMEM+=1;
-        sumPixels[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum - diagonalPixelSum;
-        ITERATIONS++;
+        PIXMEM+=1; //incrementamos o contador de acessos à memória 1 vez 
+        sumPixels[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum - diagonalPixelSum; //somamos o pixel da posição atual com o pixel da posição à esquerda, o pixel da posição acima e subtraímos o pixel da posição diagonal para obter a soma de todos os pixeis até à posição atual (temos que remover o pixel da posição diagonal porque ele foi somado duas vezes)
+        ITERATIONS++; //incrementamos o contador de iterações
       }
     }
     for (int x = 0; x < img->width; x++){
-      for (int y = 0; y < img->height; y++){
-        xstart = (x - dx) > 0 ? (x - dx) : 0;
-        ystart = (y - dy) > 0 ? (y - dy) : 0;
-        xend = (x + dx) < img->width ? (x + dx) : (img->width - 1);
-        yend = (y + dy) < img->height ? (y + dy) : (img->height - 1);
-        xSize = xend - xstart + 1;
-        ySize = yend - ystart + 1;
-        count = ySize * xSize;
-        PIXMEM+=4;
-        blurval = sumPixels[G(img, xend, yend)] - ((ystart > 0) ? sumPixels[G(img, xend, ystart - 1)] : 0) - ((xstart > 0) ? sumPixels[G(img, xstart - 1, yend)] : 0) + ((xstart > 0 && ystart > 0) ? sumPixels[G(img, xstart - 1, ystart - 1)] : 0);
-        blurval = (blurval + count / 2)/count;
-        ImageSetPixel(img, x, y, blurval);
-        ITERATIONS++;
+      for (int y = 0; y < img->height; y++){ //percorremos a imagem
+        xstart = (x - dx) > 0 ? (x - dx) : 0; //calculamos o xstart e o ystart que serão os limites inicias da área que iremos percorrer, ou seja, a área que iremos percorrer será a área que está dentro do retângulo [x-dx, x+dx]x[y-dy, y+dy]
+        ystart = (y - dy) > 0 ? (y - dy) : 0; 
+        xend = (x + dx) < img->width ? (x + dx) : (img->width - 1); //calculamos o xend e o yend que serão os limites finais da área que iremos percorrer, ou seja, a área que iremos percorrer será a área que está dentro do retângulo [x-dx, x+dx]x[y-dy, y+dy]
+        yend = (y + dy) < img->height ? (y + dy) : (img->height - 1); 
+        xSize = xend - xstart + 1; //calculamos o tamanho da área que iremos percorrer
+        ySize = yend - ystart + 1; 
+        count = ySize * xSize; //calculamos o número de pixeis que iremos percorrer
+        PIXMEM+=4; //incrementamos o contador de acessos à memória 4 vezes (1 para cada variável)
+        blurValue = sumPixels[G(img, xend, yend)];
+        if (ystart > 0) { //se o ystart for maior que 0, significa que o ystart não está na primeira linha da imagem, logo temos que subtrair o valor do pixel que está acima do ystart 
+            blurValue -= sumPixels[G(img, xend, ystart - 1)];}
+        if (xstart > 0) { //se o xstart for maior que 0, significa que o xstart não está na primeira coluna da imagem, logo temos que subtrair o valor do pixel que está à esquerda do xstart
+            blurValue -= sumPixels[G(img, xstart - 1, yend)];}
+        if (xstart > 0 && ystart > 0) { //se o xstart e o ystart forem maiores que 0, significa que o xstart e o ystart não estão na primeira coluna e na primeira linha da imagem, logo temos que somar o valor do pixel que está na posição diagonal ao xstart e ao ystart visto que ele foi subtraído duas vezes
+            blurValue += sumPixels[G(img, xstart - 1, ystart - 1)];} 
+        blurValue = (blurValue + count / 2)/count; //calculamos a média dos pixeis que percorremos arredondando o valor para o inteiro mais próximo
+        ImageSetPixel(img, x, y, blurValue); //definimos o valor do pixel na posição atual como sendo o blurValue
+        ITERATIONS++;  //incrementamos o contador de iterações
       }
     }
   }
