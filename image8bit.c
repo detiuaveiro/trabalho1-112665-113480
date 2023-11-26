@@ -593,6 +593,7 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) {
     }
     return 0;
 }
+
 ///filtering
 /// Blur an image by a applying a (2dx+1)x(2dy+1) mean filter.
 /// Each pixel is substituted by the mean of the pixels in the rectangle
@@ -605,8 +606,8 @@ void OldImageBlur(Image img, int dx, int dy) {
   // Create a temporary image to store the blurred result
   Image blurredImage = ImageCreate(img->width+1, img->height+1, img->maxval);
   ImagePaste(blurredImage,0, 0, img);
-  for (int i = 0; i <= img->width; i++) {
-    for (int j = 0; j <= img->height; j++) {
+  for (int i = 0; i < img->width; i++) {
+    for (int j = 0; j < img->height; j++) {
       int sum = 0;
       int count = 0;
 
@@ -632,20 +633,20 @@ void OldImageBlur(Image img, int dx, int dy) {
   ImageDestroy(&blurredImage); //destrói a imagem
 }
 void ImageBlur(Image img, int dx, int dy){
-  int* valuesum;
+  int* media;
   int blurval, xstart, xend, ystart, yend, xSize, ySize, count;
-  valuesum = (uint8*) malloc(sizeof(uint8*) * img->height * img->width);
-  if(check(valuesum != NULL, "Failed memory allocation")){
+  media = (uint8*) malloc(sizeof(uint8*) * img->height * img->width);
+  if(check(media != NULL, "Failed memory allocation")){
     for (int x = 0; x < img->width; x++){
       for (int y = 0; y < img->height; y++){
         PIXMEM+=4;
         int currentPixel = ImageGetPixel(img, x, y);
-        int leftPixelSum = (x > 0) ? valuesum[G(img, x - 1, y)] : 0;
-        int topPixelSum = (y > 0) ? valuesum[G(img, x, y - 1)] : 0;
-        int diagonalPixelSum = (x > 0 && y > 0) ? valuesum[G(img, x - 1, y - 1)] : 0;
+        int leftPixel = (x > 0) ? media[G(img, x - 1, y)] : 0;
+        int topPixel = (y > 0) ? media[G(img, x, y - 1)] : 0;
+        int diagonalPixel = (x > 0 && y > 0) ? media[G(img, x - 1, y - 1)] : 0;
 
         PIXMEM+=1;
-        valuesum[G(img, x, y)] = currentPixel + leftPixelSum + topPixelSum - diagonalPixelSum;
+        media[G(img, x, y)] = currentPixel + leftPixel + topPixel - diagonalPixel;
         ITERATIONS++;
       }
     }
@@ -659,12 +660,12 @@ void ImageBlur(Image img, int dx, int dy){
         ySize = yend - ystart + 1;
         count = ySize * xSize;
         PIXMEM+=4;
-        blurval = valuesum[G(img, xend, yend)] - ((ystart > 0) ? valuesum[G(img, xend, ystart - 1)] : 0) - ((xstart > 0) ? valuesum[G(img, xstart - 1, yend)] : 0) + ((xstart > 0 && ystart > 0) ? valuesum[G(img, xstart - 1, ystart - 1)] : 0);
+        blurval = media[G(img, xend, yend)] - ((ystart > 0) ? media[G(img, xend, ystart - 1)] : 0) - ((xstart > 0) ? media[G(img, xstart - 1, yend)] : 0) + ((xstart > 0 && ystart > 0) ? media[G(img, xstart - 1, ystart - 1)] : 0);
         blurval = (blurval + count / 2)/count;
         ImageSetPixel(img, x, y, blurval);
         ITERATIONS++;
       }
     }
   }
-  free(valuesum); //destroi a imagem
+  free(media); //destroi a imagem
 }

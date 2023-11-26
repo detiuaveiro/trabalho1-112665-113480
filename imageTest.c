@@ -397,6 +397,30 @@ int main(int argc, char* argv[]) {
       ImageDestroy(&subBest);
       ImageDestroy(&subWorst);
     }
+    Image branca3 = ImageLoad(argv[2]);
+    Image branca4 = ImageCrop(branca3, 0, 0, ImageWidth(branca3), ImageHeight(branca3));
+    ImageThreshold(branca, 0);
+
+    //ciclo para criar varias janelas e testar a função
+    for (int width = 1; width < ImageWidth(branca); width*=2) {
+      //criar uma janela para o melhor cenário
+      Image subBest = ImageCrop(branca, 0, 0, width, width);
+
+      //criar uma janela para o pior cenário
+      Image subWorst = ImageCrop(branca, 0, 0, width, width);
+      ImageSetPixel(subWorst, ImageWidth(subWorst)-1, ImageHeight(subWorst)-1, 0);
+
+      InstrReset(); // to reset instrumentation
+      printf("\n# IMAGELOCATESUBIMAGE WORST CASE (size: %d)\n", width);
+      ImageLocateSubImage(branca, &px, &py, subWorst);
+      InstrPrint();
+
+      printf("\n");
+
+      //destruir as imagens
+      ImageDestroy(&subBest);
+      ImageDestroy(&subWorst);
+    }
 
   InstrReset(); // to reset instrumentation
   Image imgNormal = ImageLoad(argv[2]);
