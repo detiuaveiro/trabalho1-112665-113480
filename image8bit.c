@@ -368,11 +368,6 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
   img->pixel[G(img, x, y)] = level; // Define o valor do pixel na posição (x, y) como sendo level
 } 
 
-void ImageSetMaxval(Image img, uint8 maxval) { ///
-  assert (img != NULL);
-  assert (maxval > 0);
-  img->maxval = maxval; // Define o valor máximo do pixel como sendo maxval
-}
 
 /// Pixel transformations
 
