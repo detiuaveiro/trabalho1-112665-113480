@@ -349,6 +349,31 @@ int main(int argc, char* argv[]) {
   printf("\nOldBlurred Image - Height: %d, Width: %d\n", ImageHeight(img21), ImageWidth(img21));
   InstrPrint();
   ImageDestroy(&img21);
+  Image img45 = ImageLoad(argv[2]);
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img45), ImageWidth(img45));
+  ImageBlur(img45,100,40);
+  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img45), ImageWidth(img45));
+  InstrPrint();
+  ImageDestroy(&img45);
+  Image img46 = ImageLoad(argv[2]);
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img46), ImageWidth(img46));
+  OldImageBlur(img46,100,40);
+  printf("\nOldBlurred Image - Height: %d, Width: %d\n", ImageHeight(img46), ImageWidth(img46));
+  InstrPrint();
+  ImageDestroy(&img46);
+  Image img47 = ImageLoad(argv[2]);
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img47), ImageWidth(img47));
+  ImageBlur(img47,200,80);
+  printf("\nBlurred Image - Height: %d, Width: %d\n", ImageHeight(img47), ImageWidth(img47));
+  InstrPrint();
+  ImageDestroy(&img47);
+  Image img48 = ImageLoad(argv[2]);
+  printf("\nHeight: %d, Width: %d\n", ImageHeight(img48), ImageWidth(img48));
+  OldImageBlur(img48,200,80);
+  printf("\nOldBlurred Image - Height: %d, Width: %d\n", ImageHeight(img48), ImageWidth(img48));
+  InstrPrint();
+  ImageDestroy(&img48);
+  
   //funciona se forem valores de dx e dy baixo tipo 50,20 se for 500 200 fica bue tempo e nao corre
 
   Image img22 = ImageCreate(512,512,50);
