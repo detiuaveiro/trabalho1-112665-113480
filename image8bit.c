@@ -545,7 +545,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) {
 
             uint8_t finalPixel = (blendedPixel > img1->maxval) ? img1->maxval : (blendedPixel < 0) ? 0 : (uint8_t)(blendedPixel + 0.5); // Verifica se o valor do pixel está dentro dos limites e arredonda o valor para o inteiro mais próximo.
 
-            img1->pixel[(y + i) * img1->width + (x + j)] = finalPixel; // Define o valor do pixel na posição (x + j, y + i) da imagem img1 como sendo o finalPixel
+            img1->pixel[G(img1,x+j,y+i)] = finalPixel; // Define o valor do pixel na posição (x + j, y + i) da imagem img1 como sendo o finalPixel
         }
     }
 }
